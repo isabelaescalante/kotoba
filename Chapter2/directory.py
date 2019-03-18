@@ -9,14 +9,20 @@ class Directory():
         self.functions = {}
 
     def addFunction(self, functionName, returnType, memoryAddress):
-        # Function data
-        variables = {}
+        if functionName in self.functions:
+            return False
+        else:
+            # Function data
+            variables = {}
 
-        # Array to store function attributes
-        data = [returnType, variables, memoryAddress]
+            # Array to store function attributes
+            data = [returnType, variables, memoryAddress]
 
-        # Add function to directory
-        self.functions[functionName] = data
+            # Add function to directory
+            self.functions[functionName] = data
+
+            return True
+
 
     def addVariable(self, functionName, varName, varType, varSize, varAddress):
         # Array to store variable attributes
@@ -49,6 +55,8 @@ if __name__ == '__main__':
     dir.addFunction("func1", "void", "123")
     dir.addVariable("func1", "x", "number", "1", "001")
     dir.addVariable("func1", "example", "word", "1", "002")
+    dir.addFunction("func2", "number", "124")
+    dir.addVariable("func2", "y", "number", "1", "003")
 
     dir.printDirectory()
 
