@@ -1,20 +1,19 @@
 # Functions Directory and Variable Table for Kotoba
 # Stores all functions in a program
-# Has two attributes: 
+# Has two attributes:
 #    1. Key: String representing the Id of the program
 #    2. Functions Table: Python Dictionary
 
 class Directory():
-    def __init__(self, id):
-        self.id = id
+    def __init__(self):
         self.functions = {}
-    
+
     def addFunction(self, functionName, returnType, memoryAddress):
         # Function data
         variables = {}
 
         # Array to store function attributes
-        data = [returnType. variables, memoryAddress]
+        data = [returnType, variables, memoryAddress]
 
         # Add function to directory
         self.functions[functionName] = data
@@ -30,6 +29,29 @@ class Directory():
         else:
             self.functions[functionName][1][varName] = varData
             return True
+
+    def printDirectory(self):
+        print("Function directory")
+        for key in self.functions:
+            print("Function name: " + key)
+            print("Return type: " + self.functions[key][0])
+            print("Memory address: " + self.functions[key][2])
+            print("Variables: ")
+            for varKey in self.functions[key][1]:
+                print("Var name: " + varKey)
+                print("Var type: " + self.functions[key][1][varKey][0])
+                print("Var size: " + self.functions[key][1][varKey][1])
+                print("Var address: " + self.functions[key][1][varKey][2])
+
+if __name__ == '__main__':
+    dir = Directory()
+
+    dir.addFunction("func1", "void", "123")
+    dir.addVariable("func1", "x", "number", "1", "001")
+    dir.addVariable("func1", "example", "word", "1", "002")
+
+    dir.printDirectory()
+
 
 
 # class Variable:
@@ -64,6 +86,3 @@ class Directory():
 #             return self.parent.get(name)
 #         else:
 #             return None
-        
-
-
