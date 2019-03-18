@@ -37,7 +37,7 @@ class Stack:
 class Queue:
     def __init__(self):
         self.items = deque()
-   
+
     #Returns boolean specifying if queue is empty
     def isEmpty(self):
         return self.items == []
@@ -66,7 +66,7 @@ class Queue:
     def pop(self):
         return self.items.popleft()
 
-    
+
 
 
 # #TEST
