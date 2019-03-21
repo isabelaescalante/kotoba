@@ -1,5 +1,6 @@
 import ply.yacc as yacc
 import LexKotoba
+import globalScope
 
 tokens = LexKotoba.tokens
 
@@ -39,7 +40,7 @@ def p_declare(p) :
 
 def p_decaux(p) :
 	'''decaux : type ID declareaux
-	| type ID OPENBRAC cte CLOSEBRAC declareaux'''
+	| type ID OPENBRAC cte CLOSEBRAC  declareaux'''
 
 def p_declareaux(p) :
 	'''declareaux : ENDSTMT
@@ -110,16 +111,19 @@ def p_cycle(p) :
 	| DO block WHILE OPENPAREN expression CLOSEPAREN ENDSTMT'''
 
 def p_function(p) :
-	'''function : FUNC funcaux ID OPENPAREN parameteraux CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
-	| FUNC funcaux ID OPENPAREN parameteraux CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL'''
+	'''function : FUNC funcaux ID OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+	| FUNC funcaux ID OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL'''
 
 def p_funcaux(p) :
 	'''funcaux : type
 	| VOID'''
 
+def p_parameter(p) :
+	'''parameter : type ID parameteraux
+	| type ID OPENBRAC cte CLOSEBRAC parameteraux'''
+
 def p_parameteraux(p) :
-	'''parameteraux : type ID
-	| type ID COMA parameteraux
+	'''parameteraux : COMA parameter
 	| empty'''
 
 def p_returnaux(p) :
@@ -158,7 +162,7 @@ data = '''kotoba program1;
 
 declare number x, number arr[4.0], word w, bool b, sentence s;
 
-function number myfunc(number y){
+function number myfunc(number y, number arr[5.0]){
     if(y > 2.0){
         y = y + 1.0;
     }else{
