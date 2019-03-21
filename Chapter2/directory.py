@@ -55,5 +55,6 @@ if __name__ == '__main__':
     dir.addVariable("func1", "example", "word", "1", "002")
     dir.addFunction("func2", "number", "124")
     dir.addVariable("func2", "y", "number", "1", "003")
+    dir.addFunction("func1", "number", "125")
 
     dir.printDirectory()
