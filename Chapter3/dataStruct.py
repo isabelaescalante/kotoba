@@ -3,6 +3,29 @@
 
 from collections import deque
 
+#Quadruple
+class Quad:
+    def __init__(self, op, leftOp, rightOp, res):
+        self.operator = op
+        self.leftOperator = leftOp
+        self.rightOperator = rightOp
+        self.result = res
+
+    def getOperator(self):
+        return self.operator
+
+    def getLeftOperator(self):
+        return self.leftOperator
+    
+    def getRightOperator(self):
+        return self.rightOperator
+
+    def getResult(self):
+        return self.result
+
+    def printQuad(self):
+        print('{}, {}, {}, {}'.format(self.operator, self.leftOperator, self.rightOperator, self.result))
+
 #Stack
 class Stack:
     def __init__(self):
@@ -70,6 +93,13 @@ class Queue:
 
 
 # #TEST
+# qu = Quad('operator_add',2,1,3)
+# qu.printQuad()
+# qu2 = Quad('operator_assign',2, "",'X')
+# qu2.printQuad()
+# qu3 = Quad('operator_read',"","",'Y')
+# qu3.printQuad()
+
 # s = Stack()
 # s.push('cat')
 # s.push('dog')
