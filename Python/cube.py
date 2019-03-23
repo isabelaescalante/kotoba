@@ -43,6 +43,8 @@ class Cube:
                     return False
             elif 'operator_not' in self.cube[data_type1]:
                 return True
+            else:
+                return False
         else:
             return False
 

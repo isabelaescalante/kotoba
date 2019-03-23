@@ -38,6 +38,12 @@ class Directory():
     def addVariableData(self, functionName, varName, varValue):
         self.functions[functionName][1][varName][1] = varValue
 
+    def varExists(self, functionName, varName):
+        if varName in self.functions[functionName][1]:
+            return True
+        else:
+            return False 
+
     def printDirectory(self):
         print("Function directory")
         for key in self.functions:
