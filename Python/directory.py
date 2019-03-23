@@ -38,30 +38,35 @@ class Directory():
     def addVariableData(self, functionName, varName, varValue):
         self.functions[functionName][1][varName][1] = varValue
 
+    def varExists(self, functionName, varName):
+        if varName in self.functions[functionName][1]:
+            return True
+        else:
+            return False 
+
     def printDirectory(self):
         print("Function directory")
         for key in self.functions:
-            print("Function name: " + key)
-            print("Return type: " + self.functions[key][0])
-            print("Memory address: " + self.functions[key][2])
-            print("Variables: ")
+            print("FUNCTION: " + key)
+            print("Return type: " + str(self.functions[key][0]))
+            print("Memory address: " + str(self.functions[key][2]))
             for varKey in self.functions[key][1]:
-                print("Var name: " + varKey)
-                print("Var type: " + self.functions[key][1][varKey][0])
-                print("Data: ")
+                print("\tVARIABLE: " + varKey)
+                print("\tVar type: " + str(self.functions[key][1][varKey][0]))
+                print("\tData: ")
                 for value in self.functions[key][1][varKey][1]:
-                    print(value)
-                print("Var size: " + self.functions[key][1][varKey][2])
-                print("Var address: " + self.functions[key][1][varKey][3])
-
-if __name__ == '__main__':
-    dir = Directory()
-
-    dir.addFunction("func1", "void", "123")
-    dir.addVariable("func1", "x", "number", "1", "001")
-    dir.addVariableData("func1", "x", [12, 10])
-    dir.addVariable("func1", "example", "word", "1", "002")
-    dir.addFunction("func2", "number", "124")
-    dir.addVariable("func2", "y", "number", "1", "003")
-
-    dir.printDirectory()
+                    print("\t" + str(value))
+                print("\tVar size: " + str(self.functions[key][1][varKey][2]))
+                print("\tVar address: " + str(self.functions[key][1][varKey][3]))
+#
+# if __name__ == '__main__':
+#     dir = Directory()
+#
+#     dir.addFunction("func1", "void", 123)
+#     dir.addVariable("func1", "x", "number", 1, 001)
+#     dir.addVariableData("func1", "x", [12, 10])
+#     dir.addVariable("func1", "example", "word", 1, 002)
+#     dir.addFunction("func2", "number", 124)
+#     dir.addVariable("func2", "y", "number", 1, 003)
+#
+#     dir.printDirectory()
