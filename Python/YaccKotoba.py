@@ -48,15 +48,15 @@ def p_declare(p) :
 
 def p_decaux(p) :
 	'''decaux : type ID func_declare_var declareaux
-	| type ID OPENBRAC cte CLOSEBRAC func_declare_array declareaux'''
+	| type ID OPENBRAC func_isSize cte CLOSEBRAC func_declare_array declareaux'''
 
 def p_declareaux(p) :
 	'''declareaux : ENDSTMT
 	| COMA decaux'''
 
 def p_assign(p) :
-	'''assign : ID EQUAL assignaux
-	| ID OPENBRAC cte CLOSEBRAC EQUAL assignaux'''
+	'''assign : ID func_constantID EQUAL func_assign assignaux
+	| ID func_constantID OPENBRAC func_isSize cte CLOSEBRAC EQUAL func_assign assignaux'''
 
 def p_assignaux(p) :
 	'''assignaux : exp ENDSTMT
@@ -67,11 +67,11 @@ def p_assiaux(p) :
 	| exp COMA assiaux'''
 
 def p_cte(p) :
-	'''cte : ID 
-	| BOOLCTE
-	| NUMBERCTE func_size
-	| WORDCTE
-	| SENTENCECTE'''
+	'''cte : ID func_constantID
+	| BOOLCTE func_constant func_boolCte
+	| NUMBERCTE func_constant func_numberCte
+	| WORDCTE func_constant func_wordCte
+	| SENTENCECTE func_constant func_sentenceCte''' 
 
 def p_type(p) :
 	'''type : BOOL func_type
@@ -128,7 +128,7 @@ def p_funcaux(p) :
 
 def p_parameter(p) :
 	'''parameter : type ID func_declare_var parameteraux
-	| type ID OPENBRAC cte CLOSEBRAC func_declare_array parameteraux'''
+	| type ID OPENBRAC func_isSize cte CLOSEBRAC func_declare_array parameteraux'''
 
 def p_parameteraux(p) :
 	'''parameteraux : COMA parameter
@@ -184,8 +184,15 @@ def p_func_declare_array(p) :
 	'func_declare_array : '
 	if globalScope.functionDirectory.addVariable(globalScope.functionName, p[-4], globalScope.varType, globalScope.varSize, globalScope.nextAddress) :
 		globalScope.nextAddress += 1
+		globalScope.isVarFlag = True
 	else:
 		sys.exit("Error: Variable ID already exists")
+
+# Function to toggle constant flag (size/constant)
+def p_func_isSize(p) :
+	'func_isSize : '
+	globalScope.isVarFlag = False
+
 
 # Function to declare functions and its attributes
 def p_func_declare_function(p) :
@@ -193,6 +200,7 @@ def p_func_declare_function(p) :
 	if globalScope.functionDirectory.addFunction(p[-1], globalScope.varType, globalScope.nextAddress) :
 		globalScope.functionName = p[-1]
 		globalScope.nextAddress += 1
+		globalScope.isVarFlag = True
 	else :
 		sys.exit("Error: Function ID already exists")
 
@@ -200,41 +208,78 @@ def p_func_type(p) :
 	'func_type : '
 	globalScope.varType = p[-1]
 
-def p_func_size(p) :
-	'func_size : '
-	globalScope.varSize = p[-1]
+# Function for constants
+def p_func_constant(p) :
+	'func_constant : '
+	if globalScope.isVarFlag:
+		globalScope.pendingOperands.push(p[-1])
+	else:
+		globalScope.varSize = p[-1]
 
-#Function to begin with main program
+def p_func_constantID(p) :
+	'func_constantID : '
+	if globalScope.functionDirectory.varExists(globalScope.functionName, p[-1]) or (globalScope.functionName != "Main" and globalScope.functionDirectory.varExists("Main", p[-1])) :
+		globalScope.pendingOperands.push(p[-1])
+	else :
+		sys.exit("ID does not exist")
+
+def p_func_boolCte(p) :
+	'func_boolCte : '
+	if globalScope.isVarFlag:
+		globalScope.operandTypes.push("bool")
+
+def p_func_numberCte(p) :
+	'func_numberCte : '
+	if globalScope.isVarFlag:
+		globalScope.operandTypes.push("number")
+
+def p_func_wordCte(p) :
+	'func_wordCte : '
+	if globalScope.isVarFlag:
+		globalScope.operandTypes.push("word")
+
+def p_func_sentenceCte(p) :
+	'func_sentenceCte : '
+	if globalScope.isVarFlag:
+		globalScope.operandTypes.push("sentence")
+
+
+# Function to begin with main program
 def p_func_begin_main(p) :
 	'func_begin_main : '
 	globalScope.functionName = "Main"
 
-#Function for kread
+# Function for kread
 def p_func_read(p) :
 	'func_read : '
 	input_id = p[-1]
 
-	if globalScope.functionDirectory.varExists(globalScope.functionName, input_id) :
+	if globalScope.functionDirectory.varExists(globalScope.functionName, input_id) or (globalScope.functionName != "Main" and globalScope.functionDirectory.varExists("Main", input_id)) :
 		quadruple = Quad("operator_read", "", "", input_id)
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 	else :
 		sys.exit("Input ID does not exist")
 
-#Function for kprint
-def p_func_print(p):
+# Function for kprint
+def p_func_print(p) :
 	'func_print : '
-	# output_exp = globalScope.pendingOperands.pop()
-	# quadruple = Quad("operator_print", output_exp, "", "")
-	# globalScope.quads.append(quadruple)
+	output_exp = globalScope.pendingOperands.pop()
+	quadruple = Quad("operator_print", output_exp, "", "")
+	globalScope.quads.append(quadruple)
 	globalScope.quadCount += 1
 
-#Functions for Expressions
+# Function for assign
+def p_func_assign(p) :
+	'func_assign : '
+	globalScope.pendingOperators.push("operator_assign")
+
+# Functions for Expressions
 
 yacc.yacc()
 
 
-#Build the parser
+# Build the parser
 data = '''kotoba program1;
 
 declare number x, number arr[4.0], word w, bool b, sentence s;
