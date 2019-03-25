@@ -13,10 +13,8 @@ class Directory():
         else:
             # Function data
             variables = {}
-
             # Array to store function attributes
             data = [returnType, variables, memoryAddress]
-
             # Add function to directory
             self.functions[functionName] = data
 
@@ -30,9 +28,9 @@ class Directory():
             varValue = []
             # Array to store variable attributes
             varData = [varType, varValue, varSize, varAddress]
-
             # Add variable to function's variable dictionary, key: FunctionName, 1: position 1 of functions data, varName: key for variables dictionary
             self.functions[functionName][1][varName] = varData
+            
             return True
 
     def addVariableData(self, functionName, varName, varValue):

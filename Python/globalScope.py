@@ -14,6 +14,7 @@ varSize = ""
 nextAddress = 100
 quads = []
 quadCount = 0
+isVarFlag = True
 pendingOperators = Stack()
 pendingOperands = Stack()
 operandTypes = Stack()
