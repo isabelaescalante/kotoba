@@ -56,14 +56,14 @@ class Directory():
             print("Return type: " + str(self.functions[key][0]))
             print("Memory address: " + str(self.functions[key][2]))
             for varKey in self.functions[key][1]:
-                print("\tVARIABLE: " + varKey)
-                print("\tVar type: " + str(self.functions[key][1][varKey][0]))
-                print("\tData: ")
-                for value in self.functions[key][1][varKey][1]:
-                    print("\t" + str(value))
-                print("\tVar size: " + str(self.functions[key][1][varKey][2]))
-                print("\tVar address: " + str(self.functions[key][1][varKey][3]))
-
+                if(varKey) :
+                    print("\tVARIABLE: " + varKey)
+                    print("\tVar type: " + str(self.functions[key][1][varKey][0]))
+                    print("\tData: ")
+                    for value in self.functions[key][1][varKey][1]:
+                        print("\t" + str(value))
+                    print("\tVar size: " + str(self.functions[key][1][varKey][2]))
+                    print("\tVar address: " + str(self.functions[key][1][varKey][3]))
 
 # if __name__ == '__main__':
 #     dir = Directory()

@@ -186,7 +186,7 @@ def p_func_declare_var(p) :
 
 def p_func_declare_array(p) :
 	'func_declare_array : '
-	if globalScope.functionDirectory.addVariable(globalScope.functionName, p[-4], globalScope.varType, globalScope.varSize, globalScope.nextAddress) :
+	if globalScope.functionDirectory.addVariable(globalScope.functionName, p[-5], globalScope.varType, globalScope.varSize, globalScope.nextAddress) :
 		globalScope.nextAddress += 1
 		globalScope.isVarFlag = True
 	else:
