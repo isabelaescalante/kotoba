@@ -38,20 +38,18 @@ class Cube:
         if data_type1 in types:
             if data_type1 == data_type2:
                 if operator in self.cube[data_type1]:
-                    return True
+                    return self.cube[data_type1][operator]
                 else:
-                    return False
+                    return None
             elif 'operator_not' in self.cube[data_type1]:
-                return True
+                return self.cube[data_type1][operator]
             else:
-                return False
+                return None
         else:
-            return False
+            return None
 
-# if __name__ == '__main__':
-#     semantic = Cube()
+if __name__ == '__main__':
+    semantic = Cube()
 
-#     if semantic.verification('operator_not','bool', None):
-#         print("Correct")
-#     else:
-#         print("Incorrect")
+    print(semantic.verification('operator_add','word', 'number'))
+   
