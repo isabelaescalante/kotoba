@@ -56,10 +56,10 @@ def p_declareaux(p) :
 
 def p_assign(p) :
 	'''assign : ID func_constantID EQUAL func_assign assignaux
-	| ID func_constantID OPENBRAC func_isSize cte CLOSEBRAC EQUAL func_assign assignaux'''
+	| ID func_constantID OPENBRAC func_isSize cte CLOSEBRAC EQUAL assignaux'''
 
 def p_assignaux(p) :
-	'''assignaux : exp ENDSTMT
+	'''assignaux : exp func_assign_value ENDSTMT
 	| OPENCURL assiaux CLOSECURL ENDSTMT'''
 
 def p_assiaux(p) :
@@ -93,18 +93,18 @@ def p_expression(p) :
 
 def p_relopexression(p) :
 	'''relopexpression : exp
-	| exp RELOP exp
+	| exp RELOP func_relop exp
 	| NOT exp'''
 
 def p_exp(p) :
-	'''exp : term
-	| term PLUS exp
-	| term MINUS exp'''
+	'''exp : term func_term
+	| term func_term PLUS func_term_operation exp
+	| term func_term MINUS func_term_operation exp'''
 
 def p_term(p) :
-	'''term : factor
-	| factor MULT term
-	| factor DIV term'''
+	'''term : factor func_factor
+	| factor func_factor MULT func_factor_operation term
+	| factor func_factor  DIV func_factor_operation term'''
 
 def p_factor(p) :
 	'''factor : OPENPAREN expression CLOSEPAREN
@@ -147,6 +147,7 @@ def p_callaux(p) :
 
 def p_spaux(p) :
 	'''spaux : cte
+	| cte COMA spaux
 	| empty'''
 
 def p_special(p) :
@@ -176,6 +177,11 @@ def p_func_start(p) :
 	else :
 		sys.exit("Error: Function ID already exists")
 
+# Function to toggle constant flag (size/constant)
+def p_func_isSize(p) :
+	'func_isSize : '
+	globalScope.isVarFlag = False
+
 # Functions to declare variables and arrays
 def p_func_declare_var(p) :
 	'func_declare_var : '
@@ -192,19 +198,12 @@ def p_func_declare_array(p) :
 	else:
 		sys.exit("Error: Variable ID already exists")
 
-# Function to toggle constant flag (size/constant)
-def p_func_isSize(p) :
-	'func_isSize : '
-	globalScope.isVarFlag = False
-
-
 # Function to declare functions and its attributes
 def p_func_declare_function(p) :
 	'func_declare_function : '
 	if globalScope.functionDirectory.addFunction(p[-1], globalScope.varType, globalScope.nextAddress) :
 		globalScope.functionName = p[-1]
 		globalScope.nextAddress += 1
-		globalScope.isVarFlag = True
 	else :
 		sys.exit("Error: Function ID already exists")
 
@@ -263,7 +262,7 @@ def p_func_read(p) :
 	input_id = p[-1]
 
 	if globalScope.functionDirectory.varExists(globalScope.functionName, input_id) or (globalScope.functionName != "Main" and globalScope.functionDirectory.varExists("Main", input_id)) :
-		quadruple = Quad("operator_read", "", "", input_id)
+		quadruple = Quad("operator_read", "-1", "-1", input_id)
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 	else :
@@ -273,16 +272,106 @@ def p_func_read(p) :
 def p_func_print(p) :
 	'func_print : '
 	output_exp = globalScope.pendingOperands.pop()
-	quadruple = Quad("operator_print", output_exp, "", "")
+	quadruple = Quad("operator_print", output_exp, "-1", "-1")
 	globalScope.quads.append(quadruple)
 	globalScope.quadCount += 1
 
-# Function for assign
+# Functions for assign
 def p_func_assign(p) :
 	'func_assign : '
 	globalScope.pendingOperators.push("operator_assign")
 
-# Functions for Expressions
+def p_func_assign_value(p) :
+	'func_assign_value : '
+	if not globalScope.pendingOperators.isEmpty and globalScope.pendingOperators.top() == "operator_assign":
+		# print("I am in ASSIGN VALUE")
+
+		# value
+		rightOp = globalScope.pendingOperands.pop()
+		rightType = globalScope.operandTypes.pop()
+		# id with assigned value
+		leftOp = globalScope.pendingOperands.pop()
+		leftType = globalScope.operandTypes.pop()
+	
+		operator = globalScope.pendingOperators.pop()
+		resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
+
+		if resultType != None:
+			quadruple = Quad(operator, rightOp, "-1", leftOp)
+			globalScope.quads.append(quadruple)
+			globalScope.quadCount += 1
+		else:
+			sys.exit("Unable to assign value of type " + rightType + " to ID of type " + leftType)
+			
+# Functions for Arithmetic Expressions
+def p_func_term_operation(p) :
+	'func_term_operation : '
+	if p[-1] == '+':
+		globalScope.pendingOperators.push("operator_add")
+	elif p[-1] == "-":
+		globalScope.pendingOperators.push("operator_minus")
+
+def p_func_term(p) :
+	'func_term : '
+	if not globalScope.pendingOperators.isEmpty and (globalScope.pendingOperators.top() == "operator_add" or globalScope.pendingOperators.top() == "operator_minus"):
+		# print("I am in operator add FUNC TERM")
+		rightOp = globalScope.pendingOperands.pop()
+		rightType = globalScope.operandTypes.pop()
+		leftOp = globalScope.pendingOperands.pop()
+		leftType = globalScope.operandTypes.pop()
+		operator = globalScope.pendingOperators.pop()
+
+		resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
+
+		if resultType != None:
+			result = "t" + str(globalScope.quadCount + 1)
+			quadruple = Quad(operator, leftOp, rightOp, result)
+			globalScope.quads.append(quadruple)
+			globalScope.quadCount += 1
+		else:
+			sys.exit("Unable to add/subtract term of type " + leftType + " with term of type " + rightType)
+
+def p_func_factor_operation(p) :
+	'func_factor_operation : '
+	if p[-1] == '*':
+		globalScope.pendingOperators.push("operator_mult")
+	elif p[-1] == "/":
+		globalScope.pendingOperators.push("operator_div")
+
+def p_func_factor(p) :
+	'func_factor : '
+	if not globalScope.pendingOperators.isEmpty and (globalScope.pendingOperators.top() == "operator_mult" or globalScope.pendingOperators.top() == "operator_div"):
+		rightOp = globalScope.pendingOperands.pop()
+		rightType = globalScope.operandTypes.pop()
+		leftOp = globalScope.pendingOperands.pop()
+		leftType = globalScope.operandTypes.pop()
+		operator = globalScope.pendingOperators.pop()
+
+		resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
+
+		if resultType != None:
+			result = "t" + str(globalScope.quadCount + 1)
+			quadruple = Quad(operator, leftOp, rightOp, result)
+			globalScope.quads.append(quadruple)
+			globalScope.quadCount += 1
+		else:
+			sys.exit("Unable to multiply/divide factor of type " + leftType + " with factor of type " + rightType)
+
+# Functions for Relational Expressions
+def p_func_relop(p) : 
+	'func_relop : '
+	if p[-1] == "<":
+		globalScope.pendingOperators.push("operator_greater")
+	elif p[-1] == ">":
+		globalScope.pendingOperators.push("operator_less")
+	elif p[-1] == "==":
+		globalScope.pendingOperators.push("operator_equal")
+	elif p[-1] == "!=":
+		globalScope.pendingOperators.push("operator_notequal")
+	
+
+
+# Functions for Logic Expressions
 
 # Function to clear global scope variables after function ending
 def p_func_clear(p) :
@@ -305,35 +394,11 @@ yacc.yacc()
 # Build the parser
 data = '''kotoba program1;
 
-declare number x, number arr[4.0], word w, bool b, sentence s;
-
-function number myfunc(number y){
-    declare number x;
-	if(y > 2.0){
-        y = y + 1.0;
-    }else{
-        y = y * 2.0;
-    }
-    return y;
-}
+declare number x, number y;
 
 begin
 {
-    kread(w);
-    if(!(x < 1.0)){
-        kprint(s,1.0);
-    }
-    if((x < 1.0) & (s == b)){
-        s.wordCount();
-    }
-
-    while(x > 10.0){
-        x = x - 1.0;
-    }
-
-    do{
-        x = x / 2.0;
-    }while(x > 20.0);
+    x = y;
 }
 end'''
 
