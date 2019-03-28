@@ -90,7 +90,7 @@ def t_ID(t):
     return t
 
 def t_error(t) :
-    print("Error en token: %s" % t.value[0])
+    print("Error en token: %s" % t.value)
     t.lexer.skip(1)
 
 #Build the lexer
