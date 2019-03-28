@@ -93,8 +93,8 @@ def p_expression(p) :
 
 def p_relopexression(p) :
 	'''relopexpression : exp
-	| exp RELOP func_relop exp
-	| NOT exp'''
+	| exp func_relop RELOP func_relop_operation exp func_relop
+	| NOT exp '''
 
 def p_exp(p) :
 	'''exp : term func_term
@@ -272,6 +272,7 @@ def p_func_read(p) :
 def p_func_print(p) :
 	'func_print : '
 	output_exp = globalScope.pendingOperands.pop()
+	globalScope.operandTypes.pop()
 	quadruple = Quad("operator_print", output_exp, "-1", "-1")
 	globalScope.quads.append(quadruple)
 	globalScope.quadCount += 1
@@ -283,8 +284,8 @@ def p_func_assign(p) :
 
 def p_func_assign_value(p) :
 	'func_assign_value : '
-	if not globalScope.pendingOperators.isEmpty and globalScope.pendingOperators.top() == "operator_assign":
-		# print("I am in ASSIGN VALUE")
+	if not globalScope.pendingOperators.isEmpty() and globalScope.pendingOperators.top() == "operator_assign":
+		# print("in ASSIGN VALUE")
 
 		# value
 		rightOp = globalScope.pendingOperands.pop()
@@ -313,8 +314,7 @@ def p_func_term_operation(p) :
 
 def p_func_term(p) :
 	'func_term : '
-	if not globalScope.pendingOperators.isEmpty and (globalScope.pendingOperators.top() == "operator_add" or globalScope.pendingOperators.top() == "operator_minus"):
-		# print("I am in operator add FUNC TERM")
+	if not globalScope.pendingOperators.isEmpty() and (globalScope.pendingOperators.top() == "operator_add" or globalScope.pendingOperators.top() == "operator_minus"):
 		rightOp = globalScope.pendingOperands.pop()
 		rightType = globalScope.operandTypes.pop()
 		leftOp = globalScope.pendingOperands.pop()
@@ -325,6 +325,8 @@ def p_func_term(p) :
 
 		if resultType != None:
 			result = "t" + str(globalScope.quadCount + 1)
+			globalScope.pendingOperands.push(result)
+			globalScope.operandTypes.push(resultType)
 			quadruple = Quad(operator, leftOp, rightOp, result)
 			globalScope.quads.append(quadruple)
 			globalScope.quadCount += 1
@@ -340,7 +342,7 @@ def p_func_factor_operation(p) :
 
 def p_func_factor(p) :
 	'func_factor : '
-	if not globalScope.pendingOperators.isEmpty and (globalScope.pendingOperators.top() == "operator_mult" or globalScope.pendingOperators.top() == "operator_div"):
+	if not globalScope.pendingOperators.isEmpty() and (globalScope.pendingOperators.top() == "operator_mult" or globalScope.pendingOperators.top() == "operator_div"):
 		rightOp = globalScope.pendingOperands.pop()
 		rightType = globalScope.operandTypes.pop()
 		leftOp = globalScope.pendingOperands.pop()
@@ -351,6 +353,8 @@ def p_func_factor(p) :
 
 		if resultType != None:
 			result = "t" + str(globalScope.quadCount + 1)
+			globalScope.pendingOperands.push(result)
+			globalScope.operandTypes.push(resultType)
 			quadruple = Quad(operator, leftOp, rightOp, result)
 			globalScope.quads.append(quadruple)
 			globalScope.quadCount += 1
@@ -358,8 +362,8 @@ def p_func_factor(p) :
 			sys.exit("Unable to multiply/divide factor of type " + leftType + " with factor of type " + rightType)
 
 # Functions for Relational Expressions
-def p_func_relop(p) : 
-	'func_relop : '
+def p_func_relop_operation(p) : 
+	'func_relop_operation : '
 	if p[-1] == "<":
 		globalScope.pendingOperators.push("operator_greater")
 	elif p[-1] == ">":
@@ -368,9 +372,28 @@ def p_func_relop(p) :
 		globalScope.pendingOperators.push("operator_equal")
 	elif p[-1] == "!=":
 		globalScope.pendingOperators.push("operator_notequal")
+
+def p_func_relop(p) :
+	'func_relop : '
+	if not globalScope.pendingOperators.isEmpty() and (globalScope.pendingOperators.top() == "operator_greater" or globalScope.pendingOperators.top() == "operator_less" or globalScope.pendingOperators.top() == "operator_equal" or globalScope.pendingOperators.top() == "operator_notequal") :
+		rightOp = globalScope.pendingOperands.pop()
+		rightType = globalScope.operandTypes.pop()
+		leftOp = globalScope.pendingOperands.pop()
+		leftType = globalScope.operandTypes.pop()
+		operator = globalScope.pendingOperators.pop()
+
+		resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
+
+		if resultType != None:
+			result = "t" + str(globalScope.quadCount + 1)
+			globalScope.pendingOperands.push(result)
+			globalScope.operandTypes.push(resultType)
+			quadruple = Quad(operator, leftOp, rightOp, result)
+			globalScope.quads.append(quadruple)
+			globalScope.quadCount += 1
+		else:
+			sys.exit("Unable to compare expression of type " + leftType + " with expression of type " + rightType)
 	
-
-
 # Functions for Logic Expressions
 
 # Function to clear global scope variables after function ending
@@ -394,11 +417,12 @@ yacc.yacc()
 # Build the parser
 data = '''kotoba program1;
 
-declare number x, number y;
+declare number x, number y, bool z;
 
 begin
 {
-    x = y;
+	x = 10.0 + 2.0 * 5.0;
+	kprint(2.0 == 1.0);
 }
 end'''
 
