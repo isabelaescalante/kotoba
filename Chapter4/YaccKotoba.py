@@ -364,9 +364,9 @@ def p_func_factor(p) :
 # Functions for Relational Expressions
 def p_func_relop_operation(p) : 
 	'func_relop_operation : '
-	if p[-1] == "<":
+	if p[-1] == ">":
 		globalScope.pendingOperators.push("operator_greater")
-	elif p[-1] == ">":
+	elif p[-1] == "<":
 		globalScope.pendingOperators.push("operator_less")
 	elif p[-1] == "==":
 		globalScope.pendingOperators.push("operator_equal")
@@ -421,6 +421,7 @@ declare number x, number y, bool z;
 
 begin
 {
+	z = false;
 	x = 10.0 + 2.0 * 5.0;
 	kprint(2.0 == 1.0);
 }

@@ -62,7 +62,6 @@ t_TOKENIZE = r'"tokenize"'
 t_REMOVE = r'"remove"'
 t_AND = r'\&'
 t_OR = r'\|'
-t_BOOLCTE = r'("true"|"false")'
 t_NUMBERCTE = r'[\+|\-]?[0-9]+(\.[0-9]+)'
 t_WORDCTE = r'\"[a-zA-Z0-9]+\"'
 t_SENTENCECTE = r'\"(.*?)\"'
@@ -82,6 +81,11 @@ t_CLOSEPAREN = r'\)'
 t_OPENBRAC = r'\['
 t_CLOSEBRAC = r'\]'
 t_EQUAL = r'\='
+
+def t_BOOLCTE(t) :
+    r'true|false'
+    t.value = bool(t.value)
+    return t
 
 
 def t_ID(t):
