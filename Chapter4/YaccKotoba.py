@@ -492,12 +492,15 @@ declare number x, number y, bool z, bool k;
 
 begin
 {
+	z = false;
+
 	if(x > y){
 		x = x + 1.0;
 	}else{
 		y = 1.0;
 	}
 	kprint(z | k);
+  
 	x = 10.0 + 2.0 * 5.0;
 	kprint(2.0 == 1.0);
 }
