@@ -17,4 +17,5 @@ quadCount = 0
 isVarFlag = True
 pendingOperators = Stack()
 pendingOperands = Stack()
+pendingJumps = Stack()
 operandTypes = Stack()

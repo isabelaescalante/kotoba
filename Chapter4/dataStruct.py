@@ -23,6 +23,9 @@ class Quad:
     def getResult(self):
         return self.result
 
+    def setResult(self, res):
+        self.result = res
+
     def printQuad(self):
         print('{}, {}, {}, {}'.format(self.operator, self.leftOperator, self.rightOperator, self.result))
 
