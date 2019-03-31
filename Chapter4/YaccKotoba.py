@@ -11,11 +11,11 @@ def p_start(p) :
 	'''start : KOTOBA ID func_start ENDSTMT declare startaux BEGIN func_begin_main block END
 	| KOTOBA ID func_start ENDSTMT startaux BEGIN func_begin_main block END'''
 	print("Compilation succeeded")
-	print(globalScope.functionDirectory.printDirectory())
+	# print(globalScope.functionDirectory.printDirectory())
 	
 	print("My quads are: ")
 	for quad in globalScope.quads:
-	 	quad.printQuad()
+		quad.printQuad()
 
 def p_startaux(p) :
 	'''startaux : function startaux
@@ -88,13 +88,13 @@ def p_statement(p) :
 
 def p_expression(p) :
 	'''expression : relopexpression
-	| relopexpression AND expression
-	| relopexpression OR expression'''
+	| relopexpression AND func_logicOp_operation expression
+	| relopexpression OR func_logicOp_operation expression
+	| NOT func_logicOp_operation expression'''
 
 def p_relopexression(p) :
-	'''relopexpression : exp
-	| exp func_relop RELOP func_relop_operation exp func_relop
-	| NOT exp '''
+	'''relopexpression : exp func_logicOP
+	| exp func_logicOP func_relop RELOP func_relop_operation exp func_logicOP func_relop'''
 
 def p_exp(p) :
 	'''exp : term func_term
@@ -111,8 +111,8 @@ def p_factor(p) :
 	| cte'''
 
 def p_condition(p) :
-	'''condition : IF OPENPAREN expression CLOSEPAREN block
-	|  IF OPENPAREN expression CLOSEPAREN block ELSE block'''
+	'''condition : IF OPENPAREN expression CLOSEPAREN func_if block func_endIf
+	|  IF OPENPAREN expression CLOSEPAREN func_if block ELSE func_else block func_endIf'''
 
 def p_cycle(p) :
 	'''cycle : WHILE OPENPAREN expression CLOSEPAREN block
@@ -228,7 +228,7 @@ def p_func_constantID(p) :
 		globalScope.pendingOperands.push(p[-1])
 		globalScope.operandTypes.push(globalScope.functionDirectory.getVarType("Main", p[-1]))
 	else :
-		sys.exit("ID does not exist")
+		sys.exit("ID " + p[-1] + " does not exist")
 
 def p_func_boolCte(p) :
 	'func_boolCte : '
@@ -285,8 +285,6 @@ def p_func_assign(p) :
 def p_func_assign_value(p) :
 	'func_assign_value : '
 	if not globalScope.pendingOperators.isEmpty() and globalScope.pendingOperators.top() == "operator_assign":
-		# print("in ASSIGN VALUE")
-
 		# value
 		rightOp = globalScope.pendingOperands.pop()
 		rightType = globalScope.operandTypes.pop()
@@ -395,6 +393,79 @@ def p_func_relop(p) :
 			sys.exit("Unable to compare expression of type " + leftType + " with expression of type " + rightType)
 	
 # Functions for Logic Expressions
+def p_func_logicOp_operation(p) :
+	'func_logicOp_operation : '
+	if p[-1] == "&":
+		globalScope.pendingOperators.push("operator_and")
+	elif p[-1] == "|":
+		globalScope.pendingOperators.push("operator_or")
+	elif p[-1] == "!":
+		globalScope.pendingOperators.push("operator_not")
+
+def p_func_logicOP(p) :
+	'func_logicOP : '
+	if not globalScope.pendingOperators.isEmpty() and (globalScope.pendingOperators.top() == "operator_and" or globalScope.pendingOperators.top() == "operator_or"):
+		rightOp = globalScope.pendingOperands.pop()
+		rightType = globalScope.operandTypes.pop()
+		leftOp = globalScope.pendingOperands.pop()
+		leftType = globalScope.operandTypes.pop()
+		operator = globalScope.pendingOperators.pop()
+
+		resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
+
+		if resultType != None:
+			result = "t" + str(globalScope.quadCount + 1)
+			globalScope.pendingOperands.push(result)
+			globalScope.operandTypes.push(resultType)
+			quadruple = Quad(operator, leftOp, rightOp, result)
+			globalScope.quads.append(quadruple)
+			globalScope.quadCount += 1
+		else:
+			sys.exit("Type " + leftType + " and type " + rightType + " can't be combined with a logical operator")
+	
+	elif not globalScope.pendingOperators.isEmpty() and globalScope.pendingOperators.top() == "operator_not":
+		rightOp = globalScope.pendingOperands.pop()
+		rightType = globalScope.operandTypes.pop()
+		operator = globalScope.pendingOperators.pop()
+
+		if rightType == "bool":
+			result = "t" + str(globalScope.quadCount + 1)
+			globalScope.pendingOperands.push(result)
+			globalScope.operandTypes.push("bool")
+			quadruple = Quad(operator, "-1", rightOp, result)
+			globalScope.quads.append(quadruple)
+			globalScope.quadCount += 1
+		else:
+			sys.exit("Operator not can only be applied to operands of type bool")
+
+# Functions for decisions
+def p_func_if(p) :
+	'func_if : '
+	expressionType = globalScope.operandTypes.pop()
+
+	if expressionType == "bool":
+		result = globalScope.pendingOperands.pop()
+		quadruple = Quad("operator_gotoF", result, "-1", "pending")
+		globalScope.quads.append(quadruple)
+		globalScope.quadCount += 1
+		globalScope.pendingJumps.push(globalScope.quadCount - 1)
+	else:
+		sys.exit("Cannot evaluate if condition with expression of type " + expressionType)
+
+def p_func_endIf(p) :
+	'func_endIf : '
+	endIf = globalScope.pendingJumps.pop()
+	globalScope.quads[endIf].setResult(globalScope.quadCount + 1)
+
+def p_func_else(p) :
+	'func_else : '
+	quadruple = Quad("operator_goto", "-1", "-1", "pending")
+	globalScope.quads.append(quadruple)
+	globalScope.quadCount += 1
+
+	elseFalse = globalScope.pendingJumps.pop()
+	globalScope.pendingJumps.push(globalScope.quadCount - 1)
+	globalScope.quads[elseFalse].setResult(globalScope.quadCount)
 
 # Function to clear global scope variables after function ending
 def p_func_clear(p) :
@@ -417,11 +488,19 @@ yacc.yacc()
 # Build the parser
 data = '''kotoba program1;
 
-declare number x, number y, bool z;
+declare number x, number y, bool z, bool k;
 
 begin
 {
 	z = false;
+
+	if(x > y){
+		x = x + 1.0;
+	}else{
+		y = 1.0;
+	}
+	kprint(z | k);
+  
 	x = 10.0 + 2.0 * 5.0;
 	kprint(2.0 == 1.0);
 }
