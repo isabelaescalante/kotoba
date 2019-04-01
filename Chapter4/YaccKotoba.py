@@ -143,11 +143,8 @@ def p_returnaux(p) :
 	| empty'''
 
 def p_callfunction(p) :
-	'''callfunction : ID callaux OPENPAREN spaux CLOSEPAREN ENDSTMT'''
-
-def p_callaux(p) :
-	'''callaux : DOT special
-	| empty'''
+	'''callfunction : ID DOT special OPENPAREN spaux CLOSEPAREN ENDSTMT
+	| ID OPENPAREN spaux CLOSEPAREN ENDSTMT'''
 
 def p_spaux(p) :
 	'''spaux : cte
