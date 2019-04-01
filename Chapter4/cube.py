@@ -24,8 +24,12 @@ class Cube:
 
         words['operator_assign'] = 'word'
         words['operator_add'] = 'sentence'
+        words['operator_equal'] = 'bool'
+        words['operator_notequal'] = 'bool'
 
         sentences['operator_assign'] = 'sentence'
+        sentences['operator_equal'] = 'bool'
+        sentences['operator_notequal'] = 'bool'
 
         self.cube['bool'] = bools
         self.cube['number'] = numbers
