@@ -35,6 +35,7 @@ def p_action(p) :
 
 def p_input(p) :
 	'''input : READ OPENPAREN ID func_read CLOSEPAREN ENDSTMT'''
+	print("input " + str(globalScope.quadCount))
 
 def p_output(p) :
 	'''output : WRITE OPENPAREN outputaux CLOSEPAREN ENDSTMT'''
@@ -87,32 +88,35 @@ def p_statement(p) :
 	| callfunction'''
 
 def p_expression(p) :
-	'''expression : relopexpression
-	| relopexpression AND func_logicOp_operation expression
-	| relopexpression OR func_logicOp_operation expression
-	| NOT func_logicOp_operation expression'''
+	'''expression : logexpression
+	| NOT func_logicOp_operation logexpression func_logicOP'''
+
+def p_logexpression(p) :
+	'''logexpression : relopexpression 
+	| relopexpression AND func_logicOp_operation logexpression func_logicOP
+	| relopexpression OR func_logicOp_operation logexpression func_logicOP'''
 
 def p_relopexression(p) :
-	'''relopexpression : exp func_logicOP
-	| exp func_logicOP func_relop RELOP func_relop_operation exp func_logicOP func_relop'''
+	'''relopexpression : exp 
+	| exp func_relop RELOP func_relop_operation exp func_relop'''
 
 def p_exp(p) :
-	'''exp : term func_term
-	| term func_term PLUS func_term_operation exp
-	| term func_term MINUS func_term_operation exp'''
+	'''exp : term
+	| term PLUS func_term_operation exp func_term
+	| term MINUS func_term_operation exp func_term'''
 
 def p_term(p) :
-	'''term : factor func_factor
-	| factor func_factor MULT func_factor_operation term
-	| factor func_factor  DIV func_factor_operation term'''
+	'''term : factor
+	| factor MULT func_factor_operation term func_factor
+	| factor DIV func_factor_operation term func_factor'''
 
 def p_factor(p) :
 	'''factor : OPENPAREN expression CLOSEPAREN
 	| cte'''
 
 def p_condition(p) :
-	'''condition : IF OPENPAREN expression CLOSEPAREN func_if block func_endIf
-	|  IF OPENPAREN expression CLOSEPAREN func_if block ELSE func_else block func_endIf'''
+	'''condition : IF OPENPAREN expression CLOSEPAREN func_if block func_endIf 
+	|  IF OPENPAREN expression CLOSEPAREN func_if block func_endIf ELSE func_else block func_endIf'''
 
 def p_cycle(p) :
 	'''cycle : WHILE OPENPAREN expression CLOSEPAREN block
@@ -389,6 +393,7 @@ def p_func_relop(p) :
 			quadruple = Quad(operator, leftOp, rightOp, result)
 			globalScope.quads.append(quadruple)
 			globalScope.quadCount += 1
+			print("relop " + str(globalScope.quadCount))
 		else:
 			sys.exit("Unable to compare expression of type " + leftType + " with expression of type " + rightType)
 	
@@ -435,6 +440,7 @@ def p_func_logicOP(p) :
 			quadruple = Quad(operator, "-1", rightOp, result)
 			globalScope.quads.append(quadruple)
 			globalScope.quadCount += 1
+			print("not " + str(globalScope.quadCount))
 		else:
 			sys.exit("Operator not can only be applied to operands of type bool")
 
@@ -448,14 +454,16 @@ def p_func_if(p) :
 		quadruple = Quad("operator_gotoF", result, "-1", "pending")
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
+		print("if " + str(globalScope.quadCount))
 		globalScope.pendingJumps.push(globalScope.quadCount - 1)
 	else:
 		sys.exit("Cannot evaluate if condition with expression of type " + expressionType)
 
 def p_func_endIf(p) :
 	'func_endIf : '
-	endIf = globalScope.pendingJumps.pop()
-	globalScope.quads[endIf].setResult(globalScope.quadCount + 1)
+	endIf = globalScope.pendingJumps.top()
+	print(endIf)
+	globalScope.quads[endIf-1].setResult(globalScope.quadCount)
 
 def p_func_else(p) :
 	'func_else : '
@@ -473,7 +481,7 @@ def p_func_clear(p) :
 	globalScope.pendingOperators.empty()
 	globalScope.pendingOperands.empty()
 	globalScope.operandTypes.empty()
-	globalScope.quadCount = 0
+	globalScope.quadCount = 1
 	globalScope.isVarFlag = True
 	globalScope.functionName = ""
 	globalScope.varName = ""
@@ -488,22 +496,28 @@ yacc.yacc()
 # Build the parser
 data = '''kotoba program1;
 
-declare number x, number y, bool z, bool k;
+declare number x, number arr[4.0], word w, bool b, sentence s, sentence ss;
+
+function number myfunc(number y){
+    declare number x;
+    if(y > 2.0){
+        y = y + 1.0;
+    }else{
+        y = y * 2.0;
+    }
+    return y;
+}
 
 begin
 {
-	z = false;
+    if(!((x < 1.0) & (s == ss))) {
+        kprint(s);
+    }
 
-	if(x > y){
-		x = x + 1.0;
-	}else{
-		y = 1.0;
-	}
-	kprint(z | k);
-  
-	x = 10.0 + 2.0 * 5.0;
-	kprint(2.0 == 1.0);
+	x = 1.0 + 4.0 * (5.0 / 5.0);
+
 }
-end'''
+end
+'''
 
 yacc.parse(data)
