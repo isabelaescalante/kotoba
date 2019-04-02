@@ -35,7 +35,6 @@ def p_action(p) :
 
 def p_input(p) :
 	'''input : READ OPENPAREN ID func_read CLOSEPAREN ENDSTMT'''
-	print("input " + str(globalScope.quadCount))
 
 def p_output(p) :
 	'''output : WRITE OPENPAREN outputaux CLOSEPAREN ENDSTMT'''
@@ -116,7 +115,7 @@ def p_factor(p) :
 
 def p_condition(p) :
 	'''condition : IF OPENPAREN expression CLOSEPAREN func_if block func_endIf 
-	|  IF OPENPAREN expression CLOSEPAREN func_if block func_endIf ELSE func_else block func_endIf'''
+	|  IF OPENPAREN expression CLOSEPAREN func_if block ELSE func_else block func_endElse'''
 
 def p_cycle(p) :
 	'''cycle : WHILE OPENPAREN expression CLOSEPAREN block
@@ -390,7 +389,6 @@ def p_func_relop(p) :
 			quadruple = Quad(operator, leftOp, rightOp, result)
 			globalScope.quads.append(quadruple)
 			globalScope.quadCount += 1
-			print("relop " + str(globalScope.quadCount))
 		else:
 			sys.exit("Unable to compare expression of type " + leftType + " with expression of type " + rightType)
 	
@@ -437,7 +435,6 @@ def p_func_logicOP(p) :
 			quadruple = Quad(operator, "-1", rightOp, result)
 			globalScope.quads.append(quadruple)
 			globalScope.quadCount += 1
-			print("not " + str(globalScope.quadCount))
 		else:
 			sys.exit("Operator not can only be applied to operands of type bool")
 
@@ -451,15 +448,13 @@ def p_func_if(p) :
 		quadruple = Quad("operator_gotoF", result, "-1", "pending")
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
-		print("if " + str(globalScope.quadCount))
 		globalScope.pendingJumps.push(globalScope.quadCount - 1)
 	else:
 		sys.exit("Cannot evaluate if condition with expression of type " + expressionType)
 
 def p_func_endIf(p) :
 	'func_endIf : '
-	endIf = globalScope.pendingJumps.top()
-	print(endIf)
+	endIf = globalScope.pendingJumps.pop()
 	globalScope.quads[endIf-1].setResult(globalScope.quadCount)
 
 def p_func_else(p) :
@@ -467,10 +462,17 @@ def p_func_else(p) :
 	quadruple = Quad("operator_goto", "-1", "-1", "pending")
 	globalScope.quads.append(quadruple)
 	globalScope.quadCount += 1
-
-	elseFalse = globalScope.pendingJumps.pop()
+	# Adds quad after else goto to if gotoF
+	endIf = globalScope.pendingJumps.pop()
+	globalScope.quads[endIf-1].setResult(globalScope.quadCount)
+	# Adds else goto pending jump
 	globalScope.pendingJumps.push(globalScope.quadCount - 1)
-	globalScope.quads[elseFalse].setResult(globalScope.quadCount)
+
+def p_func_endElse(p) :
+	'func_endElse : '
+	elseFalse = globalScope.pendingJumps.pop()
+	globalScope.quads[elseFalse-1].setResult(globalScope.quadCount)
+
 
 # Function to clear global scope variables after function ending
 def p_func_clear(p) :
@@ -495,24 +497,15 @@ data = '''kotoba program1;
 
 declare number x, number arr[4.0], word w, bool b, sentence s, sentence ss;
 
-function number myfunc(number y){
-    declare number x;
-    if(y > 2.0){
-        y = y + 1.0;
-    }else{
-        y = y * 2.0;
-    }
-    return y;
-}
-
 begin
 {
-    if(!((x < 1.0) & (s == ss))) {
+    if(x < 1.0) {
         kprint(s);
-    }
-
-	x = 1.0 + 4.0 * (5.0 / 5.0);
-
+    }else{
+		kread(b);
+	}
+	
+	x = 1.0;
 }
 end
 '''
