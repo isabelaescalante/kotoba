@@ -14,8 +14,11 @@ def p_start(p) :
 	# print(globalScope.functionDirectory.printDirectory())
 	
 	print("My quads are: ")
+	i = 1
 	for quad in globalScope.quads:
-		quad.printQuad()
+		print(str(i) + "   " + str(quad.getOperator()) + "\t" + str(quad.getLeftOperator()) + "\t" + str(quad.getRightOperator()) + "\t" + str(quad.getResult()))
+		#quad.printQuad()
+		i += 1
 
 def p_startaux(p) :
 	'''startaux : function startaux
@@ -122,8 +125,8 @@ def p_cycle(p) :
 	| DO func_do block WHILE OPENPAREN expression CLOSEPAREN func_endDoWhile ENDSTMT'''
 
 def p_function(p) :
-	'''function : FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-	| FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear'''
+	'''function : FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+	| FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL'''
 
 def p_funcaux(p) :
 	'''funcaux : type
@@ -171,6 +174,10 @@ def p_error(p) :
 # Function to start program
 def p_func_start(p) :
 	'func_start :'
+	quadruple = Quad("operator_goto", -1, -1, "pending")
+	globalScope.quads.append(quadruple)
+	globalScope.quadCount += 1
+	globalScope.pendingJumps.push(globalScope.quadCount - 1)
 	if globalScope.functionDirectory.addFunction("Main", "void", globalScope.nextAddress) :
 		globalScope.functionName = "Main"
 		globalScope.nextAddress += 1
@@ -188,7 +195,7 @@ def p_func_declare_var(p) :
 	if globalScope.functionDirectory.addVariable(globalScope.functionName, p[-1], globalScope.varType, 1, globalScope.nextAddress) :
 		globalScope.nextAddress += 1
 	else:
-		sys.exit("Error: Variable ID already exists")
+		sys.exit("Error: Variable ID " + p[-1] + " already exists")
 
 def p_func_declare_array(p) :
 	'func_declare_array : '
@@ -255,6 +262,8 @@ def p_func_sentenceCte(p) :
 def p_func_begin_main(p) :
 	'func_begin_main : '
 	globalScope.functionName = "Main"
+	mainGoto = globalScope.pendingJumps.pop()
+	globalScope.quads[mainGoto-1].setResult(globalScope.quadCount)
 
 # Function for kread
 def p_func_read(p) :
@@ -266,7 +275,7 @@ def p_func_read(p) :
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 	else :
-		sys.exit("Input ID does not exist")
+		sys.exit("Input ID " + input_id + " does not exist")
 
 # Function for kprint
 def p_func_print(p) :
@@ -322,7 +331,8 @@ def p_func_term(p) :
 		resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
 
 		if resultType != None:
-			result = "t" + str(globalScope.quadCount + 1)
+			result = "t" + str(globalScope.tempCount)
+			globalScope.tempCount += 1
 			globalScope.pendingOperands.push(result)
 			globalScope.operandTypes.push(resultType)
 			quadruple = Quad(operator, leftOp, rightOp, result)
@@ -350,7 +360,8 @@ def p_func_factor(p) :
 		resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
 
 		if resultType != None:
-			result = "t" + str(globalScope.quadCount + 1)
+			result = "t" + str(globalScope.tempCount)
+			globalScope.tempCount += 1
 			globalScope.pendingOperands.push(result)
 			globalScope.operandTypes.push(resultType)
 			quadruple = Quad(operator, leftOp, rightOp, result)
@@ -383,7 +394,8 @@ def p_func_relop(p) :
 		resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
 
 		if resultType != None:
-			result = "t" + str(globalScope.quadCount + 1)
+			result = "t" + str(globalScope.tempCount)
+			globalScope.tempCount += 1
 			globalScope.pendingOperands.push(result)
 			globalScope.operandTypes.push(resultType)
 			quadruple = Quad(operator, leftOp, rightOp, result)
@@ -414,7 +426,8 @@ def p_func_logicOP(p) :
 		resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
 
 		if resultType != None:
-			result = "t" + str(globalScope.quadCount + 1)
+			result = "t" + str(globalScope.tempCount)
+			globalScope.tempCount += 1
 			globalScope.pendingOperands.push(result)
 			globalScope.operandTypes.push(resultType)
 			quadruple = Quad(operator, leftOp, rightOp, result)
@@ -429,7 +442,8 @@ def p_func_logicOP(p) :
 		operator = globalScope.pendingOperators.pop()
 
 		if rightType == "bool":
-			result = "t" + str(globalScope.quadCount + 1)
+			result = "t" + str(globalScope.tempCount)
+			globalScope.tempCount += 1
 			globalScope.pendingOperands.push(result)
 			globalScope.operandTypes.push("bool")
 			quadruple = Quad(operator, "-1", rightOp, result)
@@ -557,7 +571,6 @@ function number myfunc(number y){
 begin
 {
 	b = true;
-	b = false; 
     kread(w);
     if(!(x < 1.0)){
         kprint(s,1.0);

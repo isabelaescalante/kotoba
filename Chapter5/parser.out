@@ -61,8 +61,8 @@ Rule 55    condition -> IF OPENPAREN expression CLOSEPAREN func_if block func_en
 Rule 56    condition -> IF OPENPAREN expression CLOSEPAREN func_if block ELSE func_else block func_endElse
 Rule 57    cycle -> WHILE func_while OPENPAREN expression CLOSEPAREN func_whileExp block func_endWhile
 Rule 58    cycle -> DO func_do block WHILE OPENPAREN expression CLOSEPAREN func_endDoWhile ENDSTMT
-Rule 59    function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-Rule 60    function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear
+Rule 59    function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+Rule 60    function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL
 Rule 61    funcaux -> type
 Rule 62    funcaux -> VOID
 Rule 63    parameter -> type ID func_declare_var parameteraux
@@ -200,7 +200,7 @@ func_assign          : 20
 func_assign_value    : 22
 func_begin_main      : 1 2
 func_boolCte         : 27
-func_clear           : 59 60
+func_clear           : 
 func_constant        : 27 28 29 30
 func_constantID      : 20 21 26
 func_declare_array   : 17 64
@@ -300,8 +300,8 @@ state 5
     (15) declare -> . DEC decaux
     (3) startaux -> . function startaux
     (4) startaux -> . empty
-    (59) function -> . FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-    (60) function -> . FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear
+    (59) function -> . FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+    (60) function -> . FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL
     (84) empty -> .
 
     DEC             shift and go to state 6
@@ -350,8 +350,8 @@ state 9
     (3) startaux -> function . startaux
     (3) startaux -> . function startaux
     (4) startaux -> . empty
-    (59) function -> . FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-    (60) function -> . FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear
+    (59) function -> . FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+    (60) function -> . FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL
     (84) empty -> .
 
     FUNC            shift and go to state 10
@@ -363,8 +363,8 @@ state 9
 
 state 10
 
-    (59) function -> FUNC . funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-    (60) function -> FUNC . funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear
+    (59) function -> FUNC . funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+    (60) function -> FUNC . funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL
     (61) funcaux -> . type
     (62) funcaux -> . VOID
     (31) type -> . BOOL func_type
@@ -386,8 +386,8 @@ state 11
     (1) start -> KOTOBA ID func_start ENDSTMT declare . startaux BEGIN func_begin_main block END
     (3) startaux -> . function startaux
     (4) startaux -> . empty
-    (59) function -> . FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-    (60) function -> . FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear
+    (59) function -> . FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+    (60) function -> . FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL
     (84) empty -> .
 
     FUNC            shift and go to state 10
@@ -495,8 +495,8 @@ state 21
 
 state 22
 
-    (59) function -> FUNC funcaux . ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-    (60) function -> FUNC funcaux . ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear
+    (59) function -> FUNC funcaux . ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+    (60) function -> FUNC funcaux . ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL
 
     ID              shift and go to state 30
 
@@ -559,8 +559,8 @@ state 29
 
 state 30
 
-    (59) function -> FUNC funcaux ID . func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-    (60) function -> FUNC funcaux ID . func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear
+    (59) function -> FUNC funcaux ID . func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+    (60) function -> FUNC funcaux ID . func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL
     (89) func_declare_function -> .
 
     OPENPAREN       reduce using rule 89 (func_declare_function -> .)
@@ -686,8 +686,8 @@ state 35
 
 state 36
 
-    (59) function -> FUNC funcaux ID func_declare_function . OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-    (60) function -> FUNC funcaux ID func_declare_function . OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear
+    (59) function -> FUNC funcaux ID func_declare_function . OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+    (60) function -> FUNC funcaux ID func_declare_function . OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL
 
     OPENPAREN       shift and go to state 72
 
@@ -1489,8 +1489,8 @@ state 71
 
 state 72
 
-    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN . parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN . parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear
+    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN . parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN . parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL
     (63) parameter -> . type ID func_declare_var parameteraux
     (64) parameter -> . type ID OPENBRAC func_isSize cte CLOSEBRAC func_declare_array parameteraux
     (31) type -> . BOOL func_type
@@ -2073,8 +2073,8 @@ state 100
 
 state 101
 
-    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter . CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter . CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear
+    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter . CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter . CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL
 
     CLOSEPAREN      shift and go to state 141
 
@@ -2724,8 +2724,8 @@ state 140
 
 state 141
 
-    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN . OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN . OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear
+    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN . OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN . OPENCURL blockaux returnaux ENDSTMT CLOSECURL
 
     OPENCURL        shift and go to state 164
 
@@ -3139,8 +3139,8 @@ state 163
 
 state 164
 
-    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL . declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL . blockaux returnaux ENDSTMT CLOSECURL func_clear
+    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL . declare blockaux returnaux ENDSTMT CLOSECURL
+    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL . blockaux returnaux ENDSTMT CLOSECURL
     (15) declare -> . DEC decaux
     (6) blockaux -> . action blockaux
     (7) blockaux -> . empty
@@ -3203,7 +3203,6 @@ state 164
     callfunction                   shift and go to state 49
     statement                      shift and go to state 50
     input                          shift and go to state 51
-    empty                          shift and go to state 53
     blockaux                       shift and go to state 190
     factor                         shift and go to state 55
     logexpression                  shift and go to state 56
@@ -3214,6 +3213,7 @@ state 164
     expression                     shift and go to state 69
     declare                        shift and go to state 191
     cte                            shift and go to state 65
+    empty                          shift and go to state 53
     exp                            shift and go to state 66
     action                         shift and go to state 67
     output                         shift and go to state 68
@@ -3707,7 +3707,7 @@ state 189
 
 state 190
 
-    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux . returnaux ENDSTMT CLOSECURL func_clear
+    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux . returnaux ENDSTMT CLOSECURL
     (67) returnaux -> . RETURN ID
     (68) returnaux -> . empty
     (84) empty -> .
@@ -3720,7 +3720,7 @@ state 190
 
 state 191
 
-    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare . blockaux returnaux ENDSTMT CLOSECURL func_clear
+    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare . blockaux returnaux ENDSTMT CLOSECURL
     (6) blockaux -> . action blockaux
     (7) blockaux -> . empty
     (8) action -> . input
@@ -3950,7 +3950,7 @@ state 205
 
 state 206
 
-    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux . ENDSTMT CLOSECURL func_clear
+    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux . ENDSTMT CLOSECURL
 
     ENDSTMT         shift and go to state 220
 
@@ -3964,7 +3964,7 @@ state 207
 
 state 208
 
-    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux . returnaux ENDSTMT CLOSECURL func_clear
+    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux . returnaux ENDSTMT CLOSECURL
     (67) returnaux -> . RETURN ID
     (68) returnaux -> . empty
     (84) empty -> .
@@ -4170,14 +4170,14 @@ state 219
 
 state 220
 
-    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT . CLOSECURL func_clear
+    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT . CLOSECURL
 
     CLOSECURL       shift and go to state 229
 
 
 state 221
 
-    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux . ENDSTMT CLOSECURL func_clear
+    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux . ENDSTMT CLOSECURL
 
     ENDSTMT         shift and go to state 230
 
@@ -4283,19 +4283,17 @@ state 228
 
 state 229
 
-    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL . func_clear
-    (119) func_clear -> .
+    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL .
 
-    FUNC            reduce using rule 119 (func_clear -> .)
-    BEGIN           reduce using rule 119 (func_clear -> .)
+    FUNC            reduce using rule 60 (function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL .)
+    BEGIN           reduce using rule 60 (function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL .)
 
-    func_clear                     shift and go to state 234
 
 state 230
 
-    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT . CLOSECURL func_clear
+    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT . CLOSECURL
 
-    CLOSECURL       shift and go to state 235
+    CLOSECURL       shift and go to state 234
 
 
 state 231
@@ -4340,7 +4338,7 @@ state 232
     RETURN          reduce using rule 113 (func_endElse -> .)
     ENDSTMT         reduce using rule 113 (func_endElse -> .)
 
-    func_endElse                   shift and go to state 236
+    func_endElse                   shift and go to state 235
 
 state 233
 
@@ -4351,23 +4349,13 @@ state 233
 
 state 234
 
-    (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear .
+    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL .
 
-    FUNC            reduce using rule 60 (function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear .)
-    BEGIN           reduce using rule 60 (function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear .)
+    FUNC            reduce using rule 59 (function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL .)
+    BEGIN           reduce using rule 59 (function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL .)
 
 
 state 235
-
-    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL . func_clear
-    (119) func_clear -> .
-
-    FUNC            reduce using rule 119 (func_clear -> .)
-    BEGIN           reduce using rule 119 (func_clear -> .)
-
-    func_clear                     shift and go to state 237
-
-state 236
 
     (56) condition -> IF OPENPAREN expression CLOSEPAREN func_if block ELSE func_else block func_endElse .
 
@@ -4386,14 +4374,6 @@ state 236
     CLOSECURL       reduce using rule 56 (condition -> IF OPENPAREN expression CLOSEPAREN func_if block ELSE func_else block func_endElse .)
     RETURN          reduce using rule 56 (condition -> IF OPENPAREN expression CLOSEPAREN func_if block ELSE func_else block func_endElse .)
     ENDSTMT         reduce using rule 56 (condition -> IF OPENPAREN expression CLOSEPAREN func_if block ELSE func_else block func_endElse .)
-
-
-state 237
-
-    (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear .
-
-    FUNC            reduce using rule 59 (function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear .)
-    BEGIN           reduce using rule 59 (function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear .)
 
 WARNING: 
 WARNING: Conflicts:
