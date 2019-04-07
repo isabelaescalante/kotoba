@@ -7,7 +7,7 @@ from memory import Memory
 class Directory:
     def __init__(self):
         self.functions = {}
-        self.memory = Memory()
+        self.memory = Memory(1000,1999)
 
     def addFunction(self, functionName, returnType, quadPosition):
         if functionName in self.functions:
@@ -36,8 +36,8 @@ class Directory:
         if varName in self.functions[functionName][1]:
             return False
         else:
-            varAddress = self.memory.get_VarAddress(varType)
-            self.memory.set_VarValue(varAddress, -1)
+            varAddress = self.memory.get_nextAddress(varType)
+            self.memory.set_AddressValue(varAddress, "pending")
             varData = [varType, varSize, varAddress]
             # Add variable to function's variable dictionary, key: FunctionName, 1: position 1 of functions data, varName: key for variables dictionary
             self.functions[functionName][1][varName] = varData            

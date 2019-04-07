@@ -1,212 +1,149 @@
 # Memory strucutre for Kotoba
 
 class Memory:
-    def __init__(self):
-        # Dictionaries [{number}, {word}, {sentence}, {bool}]
-        # Key: address Value: var value
-        self.variable_memory = [{}, {}, {}, {}]
-        self.constant_memory = [{}, {}, {}, {}]
+    def __init__(self, initial_address, final_address):
+        self.number_memory = {} 
+        self.word_memory = {}
+        self.sentence_memory = {}
+        self.bool_memory = {}
+
+        # Address where memory starts and end, at least 400 slots (100 per data tyoe)
+        self.initial_address = initial_address
+        self.final_address = final_address
+
+        # Number of slots per data type
+        self.slots = (final_address - initial_address + 1)/4
+        self.num_slot = initial_address
+        self.word_slot = initial_address + self.slots
+        self.sentence_slot = initial_address + (self.slots * 2)
+        self.bool_slot = initial_address + (self.slots * 3)
+
         # Counters for memory [number, word, sentence, bool]
         self.variable_counter = [0,0,0,0]
-        self.constant_counter = [0,0,0,0]
+        
 
-    def get_VarAddress(self, varType):
+    def get_nextAddress(self, varType):
         if varType is not None:
             if varType == "number":
-                address = (100+self.variable_counter[0])
+                # Check for available desocupied addresses
+                for address in self.number_memory:
+                    if self.number_memory[address] == -1:
+                        return address
+
+                # If there aren't any desocupied, return next address
+                address = (self.num_slot + self.variable_counter[0])
                 self.variable_counter[0] += 1
                 return address
             
             if varType == "word":
-                address = (200+self.variable_counter[1])
+                # Check for available desocupied addresses
+                for address in self.word_memory:
+                    if self.word_memory[address] == -1:
+                        return address
+
+                # If there aren't any desocupied, return next address
+                address = (self.word_slot + self.variable_counter[1])
                 self.variable_counter[1] += 1
                 return address
 
             if varType == "sentence":
-                address = (300+self.variable_counter[2])
+                # Check for available desocupied addresses
+                for address in self.sentence_memory:
+                    if self.sentence_memory[address] == -1:
+                        return address
+
+                # If there aren't any desocupied, return next address
+                address = (self.sentence_slot + self.variable_counter[2])
                 self.variable_counter[2] += 1
                 return address
 
             if varType == "bool":
-                address = (400+self.variable_counter[3])
+                # Check for available desocupied addresses
+                for address in self.bool_memory:
+                    if self.bool_memory[address] == -1:
+                        return address
+
+                # If there aren't any desocupied, return next address
+                address = (self.bool_slot + self.variable_counter[3])
                 self.variable_counter[3] += 1
                 return address
             
             else:
                 return -1
 
-    def get_ConstantAddress(self, varType):
-        if varType is not None:
-            if varType == "number":
-                address = (500+self.constant_counter[0])
-                self.constant_counter[0] += 1
-                return address
-            
-            if varType == "word":
-                address = (600+self.constant_counter[1])
-                self.constant_counter[1] += 1
-                return address
 
-            if varType == "sentence":
-                address = (700+self.constant_counter[2])
-                self.constant_counter[2] += 1
-                return address
-
-            if varType == "bool":
-                address = (800+self.constant_counter[3])
-                self.constant_counter[3] += 1
-                return address
-            
-            else:
-                return -1
-
-
-    def set_VarValue(self, address, varValue):
+    def set_AddressValue(self, address, varValue):
         # Number
-        if address > 99 and address < 200: 
-            self.variable_memory[0][address] = varValue
+        if address >= self.num_slot and address < self.word_slot: 
+            self.number_memory[address] = varValue
         
         # Word
-        if address > 199 and address < 300:
-            self.variable_memory[1][address] = varValue
+        if address >= self.word_slot and address < self.sentence_slot:
+            self.word_memory[address] = varValue
 
         # Sentence
-        if address > 299 and address < 400:
-            self.variable_memory[2][address] = varValue
+        if address >= self.sentence_slot and address < self.bool_slot:
+            self.sentence_memory[address] = varValue
 
         # Bool
-        if address > 399 and address < 500:
-            self.variable_memory[3][address] = varValue
-
-    def set_ConstantValue(self, address, varValue):
-        # Number Constant
-        if address > 499 and address < 600: 
-            self.constant_memory[0][address] = varValue
-        
-        # Word Constant
-        if address > 599 and address < 700:
-            self.constant_memory[1][address] = varValue
-
-        # Sentence Constant
-        if address > 699 and address < 800:
-            self.constant_memory[2][address] = varValue
-
-        # Bool Constant
-        if address > 799 and address < 900:
-            self.constant_memory[3][address] = varValue
+        if address >= self.bool_slot and address <= self.final_address:
+            self.bool_memory[address] = varValue
 
 
     def get_ValueForAddress(self, address):
-        # Variables
-        if address > 99 and address < 200: 
-            if (address - self.variable_counter[0]) < 100:
-                return self.variable_memory[0][address]
-            else:
-                return None
+        if address >= self.initial_address and address < self.word_slot:
+            if address in self.number_memory:
+                return self.number_memory[address] 
         
-        if address > 199 and address < 300:
-            if (address - self.variable_counter[1]) < 200:
-                return self.variable_memory[1][address]
-            else:
-                return None
-        if address > 299 and address < 400:
-            if (address - self.variable_counter[2]) < 300:
-                return self.variable_memory[2][address]
-            else:
-                return None
+        if address >= self.word_slot and address < self.sentence_slot:
+            if address in self.word_memory:
+                return self.word_memory[address] 
 
-        if address > 399 and address < 500:
-            if (address - self.variable_counter[3]) < 400:
-                return self.variable_memory[3][address]
-            else:
-                return None
+        if address >= self.sentence_slot and address < self.bool_slot:
+            if address in self.sentence_memory:
+                return self.sentence_memory[address] 
 
-        # Constants
-        if address > 499 and address < 600: 
-            if (address - self.constant_counter[0]) < 500:
-                return self.constant_memory[0][address]
-            else:
-                return None
-    
-        if address > 599 and address < 700:
-            if (address - self.constant_counter[1]) < 600:
-                return self.constant_memory[1][address]
-            else:
-                return None
+        if address >= self.bool_slot and address <= self.final_address:
+           if address in self.bool_memory:
+                return self.bool_memory[address] 
 
-        if address > 699 and address < 800:
-            if (address - self.constant_counter[2]) < 700:
-                return self.constant_memory[2][address]
-            else:
-                return None
+        return -1
 
-        if address > 799 and address < 900:
-            if (address - self.constant_counter[3]) < 800:
-                return self.constant_memory[3][address]
-            else:
-                return None
-        
-        else:
-            return -1
-    
-    
-
-    def print_Variables(self):
-        print("Number Variables: ")
-        for key, value in self.variable_memory[0].iteritems():
+    def print_Memory(self):
+        print("Number: ")
+        for key, value in self.number_memory.iteritems():
             print(key, value)
         
-        print("Word Variables: ")
-        for key, value in self.variable_memory[1].iteritems():
+        print("Word: ")
+        for key, value in self.word_memory.iteritems():
             print(key, value)
 
-        print("Sentence Variables: ")
-        for key, value in self.variable_memory[2].iteritems():
+        print("Sentence: ")
+        for key, value in self.sentence_memory.iteritems():
             print(key, value)
 
-        print("Bool Variables: ")
-        for key, value in self.variable_memory[3].iteritems():
+        print("Bool: ")
+        for key, value in self.bool_memory.iteritems():
             print(key, value)
-    
-    def print_Constants(self):
-        print("Number Constants: ")
-        for key, value in self.constant_memory[0].iteritems():
-            print(key, value)
-        
-        print("Word Constants: ")
-        for key, value in self.constant_memory[1].iteritems():
-            print(key, value)
-
-        print("Sentence Constants: ")
-        for key, value in self.constant_memory[2].iteritems():
-            print(key, value)
-
-        print("Bool Constants: ")
-        for key, value in self.constant_memory[3].iteritems():
-            print(key, value)
+  
 
 # #TEST
-# mem = Memory()
+# mem = Memory(1000,1999)
 
 # #VARIABLES
-# mem.set_VarValue(mem.get_VarAddress("number"), 2)
-# mem.set_VarValue(mem.get_VarAddress("number"), 3)
-# mem.set_VarValue(mem.get_VarAddress("word"), "hola")
-# mem.set_VarValue(mem.get_VarAddress("word"), "hello")
-# mem.set_VarValue(mem.get_VarAddress("sentence"), "Como estas")
-# mem.set_VarValue(mem.get_VarAddress("bool"), True)
-# #CONSTANTS
-# mem.set_ConstantValue(mem.get_ConstantAddress("number"), 3)
-# mem.set_ConstantValue(mem.get_ConstantAddress("word"), "HOLA")
-# mem.set_ConstantValue(mem.get_ConstantAddress("sentence"), "COMO ESTAS")
-# mem.set_ConstantValue(mem.get_ConstantAddress("bool"), False)
+# mem.set_AddressValue(mem.get_nextAddress("number"), 2)
+# mem.set_AddressValue(mem.get_nextAddress("number"), 3)
+# mem.set_AddressValue(mem.get_nextAddress("word"), "hola")
+# mem.set_AddressValue(mem.get_nextAddress("word"), "hello")
+# mem.set_AddressValue(mem.get_nextAddress("sentence"), "Como estas")
+# mem.set_AddressValue(mem.get_nextAddress("bool"), True)
 
-# mem.print_Variables()
+# mem.print_Memory()
 # print("----------------------")
-# mem.print_Constants()
 
-# print(mem.get_ValueForAddress(100))
-# print(mem.get_ValueForAddress(101))
+
+# print(mem.get_ValueForAddress(1000))
+# print(mem.get_ValueForAddress(1001))
 
 
 
