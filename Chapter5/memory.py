@@ -112,19 +112,23 @@ class Memory:
     def print_Memory(self):
         print("Number: ")
         for key, value in self.number_memory.iteritems():
-            print(key, value)
+            if value is not -1:
+                print(key, value)
         
         print("Word: ")
         for key, value in self.word_memory.iteritems():
-            print(key, value)
+            if value is not -1:
+                print(key, value)
 
         print("Sentence: ")
         for key, value in self.sentence_memory.iteritems():
-            print(key, value)
+            if value is not -1:
+                print(key, value)
 
         print("Bool: ")
         for key, value in self.bool_memory.iteritems():
-            print(key, value)
+            if value is not -1:
+                print(key, value)
   
 
 # #TEST
@@ -141,6 +145,15 @@ class Memory:
 # mem.print_Memory()
 # print("----------------------")
 
+# mem.set_AddressValue(1000, -1)
+
+# mem.print_Memory()
+# print("----------------------")
+
+# mem.set_AddressValue(mem.get_nextAddress("number"), 10)
+
+# mem.print_Memory()
+# print("----------------------")
 
 # print(mem.get_ValueForAddress(1000))
 # print(mem.get_ValueForAddress(1001))
