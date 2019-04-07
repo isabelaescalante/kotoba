@@ -11,7 +11,7 @@ def p_start(p) :
 	'''start : KOTOBA ID func_start ENDSTMT declare startaux BEGIN func_begin_main block END
 	| KOTOBA ID func_start ENDSTMT startaux BEGIN func_begin_main block END'''
 	print("Compilation succeeded")
-	# print(globalScope.functionDirectory.printDirectory())
+	print(globalScope.functionDirectory.printDirectory())
 	
 	print("My quads are: ")
 	i = 1
@@ -178,9 +178,8 @@ def p_func_start(p) :
 	globalScope.quads.append(quadruple)
 	globalScope.quadCount += 1
 	globalScope.pendingJumps.push(globalScope.quadCount - 1)
-	if globalScope.functionDirectory.addFunction("Main", "void", globalScope.nextAddress) :
+	if globalScope.functionDirectory.addFunction("Main", "void", -1) :
 		globalScope.functionName = "Main"
-		globalScope.nextAddress += 1
 	else :
 		sys.exit("Error: Function ID already exists")
 
@@ -192,15 +191,12 @@ def p_func_isSize(p) :
 # Functions to declare variables and arrays
 def p_func_declare_var(p) :
 	'func_declare_var : '
-	if globalScope.functionDirectory.addVariable(globalScope.functionName, p[-1], globalScope.varType, 1, globalScope.nextAddress) :
-		globalScope.nextAddress += 1
-	else:
+	if not globalScope.functionDirectory.addVariable(globalScope.functionName, p[-1], globalScope.varType, 1) :
 		sys.exit("Error: Variable ID " + p[-1] + " already exists")
 
 def p_func_declare_array(p) :
 	'func_declare_array : '
-	if globalScope.functionDirectory.addVariable(globalScope.functionName, p[-5], globalScope.varType, globalScope.varSize, globalScope.nextAddress) :
-		globalScope.nextAddress += 1
+	if globalScope.functionDirectory.addVariable(globalScope.functionName, p[-5], globalScope.varType, globalScope.varSize) :
 		globalScope.isVarFlag = True
 	else:
 		sys.exit("Error: Variable ID already exists")
@@ -208,9 +204,8 @@ def p_func_declare_array(p) :
 # Function to declare functions and its attributes
 def p_func_declare_function(p) :
 	'func_declare_function : '
-	if globalScope.functionDirectory.addFunction(p[-1], globalScope.varType, globalScope.nextAddress) :
+	if globalScope.functionDirectory.addFunction(p[-1], globalScope.varType, globalScope.quadCount) :
 		globalScope.functionName = p[-1]
-		globalScope.nextAddress += 1
 	else :
 		sys.exit("Error: Function ID already exists")
 
@@ -264,6 +259,7 @@ def p_func_begin_main(p) :
 	globalScope.functionName = "Main"
 	mainGoto = globalScope.pendingJumps.pop()
 	globalScope.quads[mainGoto-1].setResult(globalScope.quadCount)
+	globalScope.functionDirectory.setFuncQuadPosition("Main", globalScope.quadCount)
 
 # Function for kread
 def p_func_read(p) :
@@ -536,7 +532,7 @@ def	p_func_endWhile(p) :
 	globalScope.quads[endWhile-1].setResult(globalScope.quadCount)
 
 
-# Function to clear global scope variables after function ending
+# Function to clear global scope variables after program ending
 def p_func_clear(p) :
 	'func_clear : '
 	globalScope.pendingOperators.empty()

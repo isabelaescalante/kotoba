@@ -2,35 +2,42 @@
 # Stores all functions in a program
 # Has one attributes:
 #    1. Functions Table: Python Dictionary
+from memory import Memory
 
-class Directory():
+class Directory:
     def __init__(self):
         self.functions = {}
+        self.memory = Memory()
 
-    def addFunction(self, functionName, returnType, memoryAddress):
+    def addFunction(self, functionName, returnType, quadPosition):
         if functionName in self.functions:
             return False
         else:
             # Function data
             variables = {}
             # Array to store function attributes
-            data = [returnType, variables, memoryAddress]
+            data = [returnType, variables, quadPosition]
             # Add function to directory
             self.functions[functionName] = data
 
             return True
 
-    def getFuncAddress(self, functionName):
+    def getFuncQuadPosition(self, functionName):
         if functionName in self.functions :
             return self.functions[functionName][2]
         else:
             return None
 
-    def addVariable(self, functionName, varName, varType, varSize, varAddress):
+    def setFuncQuadPosition(self, functionName, position):
+        if functionName in self.functions :
+            self.functions[functionName][2] = position
+
+    def addVariable(self, functionName, varName, varType, varSize):
         if varName in self.functions[functionName][1]:
             return False
         else:
-            # Array to store variable attributes
+            varAddress = self.memory.get_VarAddress(varType)
+            self.memory.set_VarValue(varAddress, -1)
             varData = [varType, varSize, varAddress]
             # Add variable to function's variable dictionary, key: FunctionName, 1: position 1 of functions data, varName: key for variables dictionary
             self.functions[functionName][1][varName] = varData            
@@ -60,16 +67,15 @@ class Directory():
         for key in self.functions:
             print("FUNCTION: " + key)
             print("Return type: " + str(self.functions[key][0]))
-            print("Memory address: " + str(self.functions[key][2]))
+            print("Quad position: " + str(self.functions[key][2]))
             for varKey in self.functions[key][1]:
                 if(varKey) :
+                    address = self.functions[key][1][varKey][2]
                     print("\tVARIABLE: " + varKey)
+                    print("\tVar address: " + str(address))
                     print("\tVar type: " + str(self.functions[key][1][varKey][0]))
-                    print("\tData: ")
-                    for value in self.functions[key][1][varKey][1]:
-                        print("\t" + str(value))
-                    print("\tVar size: " + str(self.functions[key][1][varKey][2]))
-                    print("\tVar address: " + str(self.functions[key][1][varKey][3]))
+                    print("\tVar value: ") + str(self.memory.get_ValueForAddress(address))
+                    print("\tVar size: " + str(self.functions[key][1][varKey][1]))
 
 # if __name__ == '__main__':
 #     dir = Directory()

@@ -10,7 +10,6 @@ functionName = ""
 varName = ""
 varType = ""
 varSize = ""
-nextAddress = 100
 quads = []
 quadCount = 1
 tempCount = 1
