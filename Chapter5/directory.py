@@ -7,7 +7,10 @@ from memory import Memory
 class Directory:
     def __init__(self):
         self.functions = {}
-        self.memory = Memory(1000,1999)
+        self.global_memory = Memory(1000, 1999)
+        self.local_memory = Memory(2000, 2499)
+        self.temporal_memory = Memory(2500, 3999)
+        self.constant_memory = Memory(4000, 4999)
 
     def addFunction(self, functionName, returnType, quadPosition):
         if functionName in self.functions:
@@ -36,8 +39,8 @@ class Directory:
         if varName in self.functions[functionName][1]:
             return False
         else:
-            varAddress = self.memory.get_nextAddress(varType)
-            self.memory.set_AddressValue(varAddress, "pending")
+            varAddress = self.global_memory.get_nextAddress(varType)
+            self.global_memory.set_AddressValue(varAddress, "pending")
             varData = [varType, varSize, varAddress]
             # Add variable to function's variable dictionary, key: FunctionName, 1: position 1 of functions data, varName: key for variables dictionary
             self.functions[functionName][1][varName] = varData            
@@ -74,7 +77,7 @@ class Directory:
                     print("\tVARIABLE: " + varKey)
                     print("\tVar address: " + str(address))
                     print("\tVar type: " + str(self.functions[key][1][varKey][0]))
-                    print("\tVar value: ") + str(self.memory.get_ValueForAddress(address))
+                    print("\tVar value: ") + str(self.global_memory.get_ValueForAddress(address))
                     print("\tVar size: " + str(self.functions[key][1][varKey][1]))
 
 # if __name__ == '__main__':
