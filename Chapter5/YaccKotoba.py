@@ -125,15 +125,15 @@ def p_cycle(p) :
 	| DO func_do block WHILE OPENPAREN expression CLOSEPAREN func_endDoWhile ENDSTMT'''
 
 def p_function(p) :
-	'''function : FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
-	| FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL'''
+	'''function : FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
+	| FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear'''
 
 def p_funcaux(p) :
 	'''funcaux : type
 	| VOID'''
 
 def p_parameter(p) :
-	'''parameter : type ID func_declare_var parameteraux
+	'''parameter : type ID func_declare_par parameteraux
 	| type ID OPENBRAC func_isSize cte CLOSEBRAC func_declare_array parameteraux'''
 
 def p_parameteraux(p) :
@@ -145,12 +145,12 @@ def p_returnaux(p) :
 	| empty'''
 
 def p_callfunction(p) :
-	'''callfunction : ID DOT special OPENPAREN spaux CLOSEPAREN ENDSTMT
-	| ID OPENPAREN spaux CLOSEPAREN ENDSTMT'''
+	'''callfunction : CALL ID DOT special OPENPAREN spaux CLOSEPAREN ENDSTMT
+	| CALL ID func_callFunc OPENPAREN spaux CLOSEPAREN func_endCallFunction ENDSTMT'''
 
 def p_spaux(p) :
-	'''spaux : cte
-	| cte COMA spaux
+	'''spaux : cte func_callFuncParameter  
+	| cte func_callFuncParameter COMA spaux
 	| empty'''
 
 def p_special(p) :
@@ -201,6 +201,13 @@ def p_func_declare_array(p) :
 	else:
 		sys.exit("Error: Variable ID already exists")
 
+def p_func_declare_par(p) :
+	'func_declare_par : '
+	if not globalScope.functionDirectory.addVariable(globalScope.functionName, p[-1], globalScope.varType, 1) :
+		sys.exit("Error: Variable ID " + p[-1] + " already exists")
+	if not globalScope.functionDirectory.addParameter(globalScope.functionName, globalScope.varType) :
+		sys.exit("Error: Parameter of type " + p[-1] + " cannot be added")
+
 # Function to declare functions and its attributes
 def p_func_declare_function(p) :
 	'func_declare_function : '
@@ -223,9 +230,12 @@ def p_func_constant(p) :
 
 def p_func_constantID(p) :
 	'func_constantID : '
-	if globalScope.functionDirectory.varExists(globalScope.functionName, p[-1]) :
+	if globalScope.functionDirectory.varExists(globalScope.functionName, p[-1]):
 		globalScope.pendingOperands.push(p[-1])
 		globalScope.operandTypes.push(globalScope.functionDirectory.getVarType(globalScope.functionName, p[-1]))
+	elif globalScope.functionDirectory.functionExists(p[-1]) :
+		globalScope.pendingOperands.push(p[-1])
+		globalScope.operandTypes.push(globalScope.functionDirectory.functionType(p[-1]))
 	elif globalScope.functionName != "Main" and globalScope.functionDirectory.varExists("Main", p[-1]) :
 		globalScope.pendingOperands.push(p[-1])
 		globalScope.operandTypes.push(globalScope.functionDirectory.getVarType("Main", p[-1]))
@@ -531,6 +541,40 @@ def	p_func_endWhile(p) :
 
 	globalScope.quads[endWhile-1].setResult(globalScope.quadCount)
 
+def p_func_callFunc(p) :
+	'func_callFunc : '
+	if globalScope.functionDirectory.functionExists(p[-1]) :
+		globalScope.functionCalled = p[-1]
+
+		globalScope.pendingOperands.push(p[-1])
+		quadruple = Quad("operator_era", p[-1], "-1", "-1")
+		globalScope.quads.append(quadruple)
+		globalScope.quadCount += 1
+	else :
+		sys.exit("Function ID doesn't exist in directory")
+
+def p_func_callFuncParameter(p) : 
+	'func_callFuncParameter : '
+	parameterVar = globalScope.pendingOperands.pop()
+	parameterType = globalScope.operandTypes.pop()
+
+	if parameterType == globalScope.functionDirectory.functions[globalScope.functionCalled][2][globalScope.parameterCount - 1] :
+		quadruple = Quad("operator_param", parameterVar, "-1", "param" + str(globalScope.parameterCount))
+		globalScope.quads.append(quadruple)
+		globalScope.quadCount += 1
+		globalScope.parameterCount += 1
+	else : 
+		sys.exit("Parameter incorrect for function " + globalScope.pendingOperands.top())
+
+def p_func_endCallFunction(p) :
+	'func_endCallFunction : '
+	if globalScope.functionCalled == globalScope.pendingOperands.pop() :
+		quadruple = Quad("operator_gosub", globalScope.functionCalled, "-1", "-1")
+		globalScope.quads.append(quadruple)
+		globalScope.quadCount += 1
+
+		globalScope.functionCalled = ""
+		globalScope.parameterCount = 1
 
 # Function to clear global scope variables after program ending
 def p_func_clear(p) :
@@ -538,13 +582,11 @@ def p_func_clear(p) :
 	globalScope.pendingOperators.empty()
 	globalScope.pendingOperands.empty()
 	globalScope.operandTypes.empty()
-	globalScope.quadCount = 1
 	globalScope.isVarFlag = True
 	globalScope.functionName = ""
 	globalScope.varName = ""
 	globalScope.varType = ""
 	globalScope.varSize = ""
-	globalScope.quads = []
 
 yacc.yacc()
 
@@ -552,36 +594,20 @@ yacc.yacc()
 # Build the parser
 data = '''kotoba program1;
 
-declare number x, number arr[4.0], word w, bool b, sentence s, sentence ss;
+declare number x, bool b, sentence s;
 
-function number myfunc(number y){
+function number myfunc(number y, bool w){
     declare number x;
-    if(y > 2.0){
+    if(y > 2.0) {
         y = y + 1.0;
-    }else{
-        y = y * 2.0;
     }
     return y;
 }
 
 begin
 {
-	b = true;
-    kread(w);
-    if(!(x < 1.0)){
-        kprint(s,1.0);
-    }
-    if((x < 1.0) & (s == ss)){
-        b = false;
-    }
-
-    while(x > 10.0){
-        x = x - 1.0;
-    }
-
-    do{
-        x = x / 2.0;
-    }while(x > 20.0);
+	b = false;
+	call myfunc(x, b);
 }
 end
 '''
