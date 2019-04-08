@@ -109,6 +109,26 @@ class Memory:
 
         return -1
 
+
+    def get_AddressForConstant(self, cte):
+        for address, value in self.number_memory.items():
+            if value == cte:
+                return address
+
+        for address, value in self.word_memory.items():
+            if value == cte:
+                return address
+
+        for address, value in self.sentence_memory.items():
+            if value == cte:
+                return address
+
+        for address, value in self.bool_memory.items():
+            if value == cte:
+                return address
+
+        return -1
+
     def print_Memory(self):
         print("Number: ")
         for key, value in self.number_memory.iteritems():
@@ -155,10 +175,10 @@ class Memory:
 # mem.print_Memory()
 # print("----------------------")
 
-# print(mem.get_ValueForAddress(1000))
-# print(mem.get_ValueForAddress(1001))
+# # print(mem.get_ValueForAddress(1000))
+# # print(mem.get_ValueForAddress(1001))
 
-
+# print(mem.get_AddressForConstant(10))
 
 
 
