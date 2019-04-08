@@ -18,8 +18,9 @@ class Directory:
         else:
             # Function data
             variables = {}
+            parameters = []
             # Array to store function attributes
-            data = [returnType, variables, quadPosition]
+            data = [returnType, variables, parameters, quadPosition]
             # Add function to directory
             self.functions[functionName] = data
 
@@ -27,13 +28,13 @@ class Directory:
 
     def getFuncQuadPosition(self, functionName):
         if functionName in self.functions :
-            return self.functions[functionName][2]
+            return self.functions[functionName][3]
         else:
             return None
 
     def setFuncQuadPosition(self, functionName, position):
         if functionName in self.functions :
-            self.functions[functionName][2] = position
+            self.functions[functionName][3] = position
 
     def addVariable(self, functionName, varName, varType, varSize):
         if varName in self.functions[functionName][1]:
@@ -46,12 +47,27 @@ class Directory:
             self.functions[functionName][1][varName] = varData            
             return True
 
+    def addParameter(self, functionName, varType):
+        self.functions[functionName][2].append(varType)            
+        return True
 
     def varExists(self, functionName, varName):
         if varName in self.functions[functionName][1]:
             return True
         else:
             return False 
+
+    def functionExists(self, functionName):
+        if functionName in self.functions:
+            return True
+        else:
+            return False 
+    
+    def functionType(self, functionName) :
+        if self.functionExists(functionName) :
+            return self.functions[functionName][0]
+        else:
+            return None    
 
     def getVarType(self, functionName, varName):
         if self.varExists(functionName, varName) :
@@ -70,14 +86,14 @@ class Directory:
         for key in self.functions:
             print("FUNCTION: " + key)
             print("Return type: " + str(self.functions[key][0]))
-            print("Quad position: " + str(self.functions[key][2]))
+            print("Quad position: " + str(self.functions[key][3]))
             for varKey in self.functions[key][1]:
                 if(varKey) :
                     address = self.functions[key][1][varKey][2]
                     print("\tVARIABLE: " + varKey)
                     print("\tVar address: " + str(address))
                     print("\tVar type: " + str(self.functions[key][1][varKey][0]))
-                    print("\tVar value: ") + str(self.global_memory.get_ValueForAddress(address))
+                    print("\tVar value: " + str(self.global_memory.get_ValueForAddress(address)))
                     print("\tVar size: " + str(self.functions[key][1][varKey][1]))
 
 # if __name__ == '__main__':

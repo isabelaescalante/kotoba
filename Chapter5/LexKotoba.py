@@ -1,6 +1,6 @@
 import ply.lex as lex
 
-tokens = ['KOTOBA', 'BEGIN', 'END', 'READ', 'WRITE', 'DEC', 'BOOL', 'NUMBER', 'WORD', 'SENTENCE', 'IF', 'ELSE', 'DO', 'WHILE', 'FUNC', 'RETURN', 'VOID', 'LENGTH', 'FREQUENCY', 'SEARCH', 'EXISTS', 'MEAN', 'MEDIAN', 'MODE', 'WORDCOUNT', 'TOKENIZE', 'REMOVE', 'AND', 'OR', 'ID', 'BOOLCTE', 'NUMBERCTE', 'WORDCTE', 'SENTENCECTE', 'RELOP', 'PLUS', 'MINUS', 'MULT', 'DIV', 'NOT', 'ENDSTMT', 'COMA', 'DOT', 'OPENCURL', 'CLOSECURL', 'OPENPAREN', 'CLOSEPAREN', 'OPENBRAC', 'CLOSEBRAC', 'EQUAL']
+tokens = ['KOTOBA', 'BEGIN', 'END', 'READ', 'WRITE', 'DEC', 'BOOL', 'NUMBER', 'WORD', 'SENTENCE', 'IF', 'ELSE', 'DO', 'WHILE', 'FUNC', 'RETURN', 'VOID', 'LENGTH', 'FREQUENCY', 'SEARCH', 'EXISTS', 'MEAN', 'MEDIAN', 'MODE', 'WORDCOUNT', 'TOKENIZE', 'REMOVE', 'AND', 'OR', 'ID', 'BOOLCTE', 'NUMBERCTE', 'WORDCTE', 'SENTENCECTE', 'RELOP', 'PLUS', 'MINUS', 'MULT', 'DIV', 'NOT', 'ENDSTMT', 'COMA', 'DOT', 'OPENCURL', 'CLOSECURL', 'OPENPAREN', 'CLOSEPAREN', 'OPENBRAC', 'CLOSEBRAC', 'EQUAL', 'CALL']
 
 reserved = {
     'kotoba' : 'KOTOBA',
@@ -29,7 +29,8 @@ reserved = {
     'mode' : 'MODE',
     'wordCount' : 'WORDCOUNT',
     'tokenize' : 'TOKENIZE',
-    'remove' : 'REMOVE'
+    'remove' : 'REMOVE',
+    'call' : 'CALL'
 }
 
 t_ignore = ' \t\n'
@@ -60,6 +61,7 @@ t_MODE = r'"mode"'
 t_WORDCOUNT = r'"wordCount"'
 t_TOKENIZE = r'"tokenize"'
 t_REMOVE = r'"remove"'
+t_CALL = r'"call"'
 t_AND = r'\&'
 t_OR = r'\|'
 t_NUMBERCTE = r'[\+|\-]?[0-9]+(\.[0-9]+)'
@@ -84,7 +86,7 @@ t_EQUAL = r'\='
 
 def t_BOOLCTE(t) :
     r'true|false'
-    t.value = bool(t.value)
+    t.type = reserved.get(t.value,'BOOLCTE')
     return t
 
 
