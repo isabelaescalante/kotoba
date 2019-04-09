@@ -1,7 +1,8 @@
 # Memory strucutre for Kotoba
 
 class Memory:
-    def __init__(self, initial_address, final_address):
+    def __init__(self, name, initial_address, final_address):
+        self.name = name
         self.number_memory = {} 
         self.word_memory = {}
         self.sentence_memory = {}
@@ -25,47 +26,27 @@ class Memory:
     def get_nextAddress(self, varType):
         if varType is not None:
             if varType == "number":
-                # Check for available desocupied addresses
-                for address in self.number_memory:
-                    if self.number_memory[address] == -1:
-                        return address
-
-                # If there aren't any desocupied, return next address
                 address = (self.num_slot + self.variable_counter[0])
                 self.variable_counter[0] += 1
+                self.set_AddressValue(address, -1) #initialize new address with -1
                 return address
             
             if varType == "word":
-                # Check for available desocupied addresses
-                for address in self.word_memory:
-                    if self.word_memory[address] == -1:
-                        return address
-
-                # If there aren't any desocupied, return next address
                 address = (self.word_slot + self.variable_counter[1])
                 self.variable_counter[1] += 1
+                self.set_AddressValue(address, -1) #initialize new address with -1
                 return address
 
             if varType == "sentence":
-                # Check for available desocupied addresses
-                for address in self.sentence_memory:
-                    if self.sentence_memory[address] == -1:
-                        return address
-
-                # If there aren't any desocupied, return next address
                 address = (self.sentence_slot + self.variable_counter[2])
                 self.variable_counter[2] += 1
+                self.set_AddressValue(address, -1) #initialize new address with -1
                 return address
 
             if varType == "bool":
-                # Check for available desocupied addresses
-                for address in self.bool_memory:
-                    if self.bool_memory[address] == -1:
-                        return address
-
-                # If there aren't any desocupied, return next address
                 address = (self.bool_slot + self.variable_counter[3])
                 self.variable_counter[3] += 1
+                self.set_AddressValue(address, -1) #initialize new address with -1
                 return address
             
             else:
@@ -129,30 +110,38 @@ class Memory:
 
         return -1
 
+    def clear_Memory(self):
+        self.variable_counter[0] = 0
+        self.variable_counter[1] = 0
+        self.variable_counter[2] = 0
+        self.variable_counter[3] = 0
+        self.number_memory = {} 
+        self.word_memory = {}
+        self.sentence_memory = {}
+        self.bool_memory = {}
+
     def print_Memory(self):
+        print(self.name + " Memory")
+        print("-----------------------------")
         print("Number: ")
         for key, value in self.number_memory.iteritems():
-            if value is not -1:
-                print(key, value)
+            print(key, value)
         
         print("Word: ")
         for key, value in self.word_memory.iteritems():
-            if value is not -1:
-                print(key, value)
+            print(key, value)
 
         print("Sentence: ")
         for key, value in self.sentence_memory.iteritems():
-            if value is not -1:
-                print(key, value)
+            print(key, value)
 
         print("Bool: ")
         for key, value in self.bool_memory.iteritems():
-            if value is not -1:
-                print(key, value)
+            print(key, value)
   
 
 # #TEST
-# mem = Memory(1000,1999)
+# mem = Memory("Global", 1000, 1999)
 
 # #VARIABLES
 # mem.set_AddressValue(mem.get_nextAddress("number"), 2)
@@ -165,20 +154,10 @@ class Memory:
 # mem.print_Memory()
 # print("----------------------")
 
-# mem.set_AddressValue(1000, -1)
-
-# mem.print_Memory()
-# print("----------------------")
-
-# mem.set_AddressValue(mem.get_nextAddress("number"), 10)
-
-# mem.print_Memory()
-# print("----------------------")
-
 # # print(mem.get_ValueForAddress(1000))
 # # print(mem.get_ValueForAddress(1001))
 
-# print(mem.get_AddressForConstant(10))
+# #print(mem.get_AddressForConstant(10))
 
 
 

@@ -7,10 +7,9 @@ from memory import Memory
 class Directory:
     def __init__(self):
         self.functions = {}
-        self.global_memory = Memory(1000, 1999)
-        self.local_memory = Memory(2000, 2499)
-        self.temporal_memory = Memory(2500, 3999)
-        self.constant_memory = Memory(4000, 4999)
+        self.global_memory = Memory("Global", 1000, 1999) # 1000 slots
+        self.local_memory = Memory("Local/Temporal", 2000, 3999) # 2000 slots
+        self.constant_memory = Memory("Constant", 4000, 4999) # 1000 slots
 
     def addFunction(self, functionName, returnType, quadPosition):
         if functionName in self.functions:
@@ -40,8 +39,11 @@ class Directory:
         if varName in self.functions[functionName][1]:
             return False
         else:
-            varAddress = self.global_memory.get_nextAddress(varType)
-            self.global_memory.set_AddressValue(varAddress, "pending")
+            if functionName == "Main":
+                varAddress = self.global_memory.get_nextAddress(varType)
+            else:
+                varAddress = self.local_memory.get_nextAddress(varType)
+
             varData = [varType, varSize, varAddress]
             # Add variable to function's variable dictionary, key: FunctionName, 1: position 1 of functions data, varName: key for variables dictionary
             self.functions[functionName][1][varName] = varData            
@@ -70,16 +72,11 @@ class Directory:
             return None    
 
     def getVarType(self, functionName, varName):
-        if self.varExists(functionName, varName) :
-            return self.functions[functionName][1][varName][0]
-        else:
-            return None
+        return self.functions[functionName][1][varName][0]
+        
     
     def getVarAddress(self, functionName, varName):
-        if self.varExists(functionName, varName) :
-            return self.functions[functionName][1][varName][2]
-        else:
-            return None
+        return self.functions[functionName][1][varName][2]
 
     def printDirectory(self):
         print("Function directory")
