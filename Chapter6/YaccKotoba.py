@@ -10,15 +10,26 @@ tokens = LexKotoba.tokens
 def p_start(p) :
 	'''start : KOTOBA ID func_start ENDSTMT declare startaux BEGIN func_begin_main block END
 	| KOTOBA ID func_start ENDSTMT startaux BEGIN func_begin_main block END'''
+	
 	print("Compilation succeeded")
-	print(globalScope.functionDirectory.printDirectory())
+	#print(globalScope.functionDirectory.printDirectory())
+	print("-----------------------------")
 	
 	print("My quads are: ")
 	i = 1
 	for quad in globalScope.quads:
-		print(str(i) + "   " + str(quad.getOperator()) + "\t" + str(quad.getLeftOperator()) + "\t" + str(quad.getRightOperator()) + "\t" + str(quad.getResult()))
+		print(str(i) + "   " + str(quad.getOperator()) + "\t" + str(quad.getLeftOperator()) + "\t\t" + str(quad.getRightOperator()) + "\t\t" + str(quad.getResult()))
 		#quad.printQuad()
 		i += 1
+	
+	print("-----------------------------")
+	globalScope.functionDirectory.global_memory.print_Memory()
+	print("-----------------------------")
+	globalScope.functionDirectory.local_memory.print_Memory()
+	print("-----------------------------")
+	globalScope.functionDirectory.constant_memory.print_Memory()
+	print("-----------------------------")
+	
 
 def p_startaux(p) :
 	'''startaux : function startaux
@@ -71,10 +82,10 @@ def p_assiaux(p) :
 
 def p_cte(p) :
 	'''cte : ID func_constantID
-	| BOOLCTE func_constant func_boolCte
-	| NUMBERCTE func_constant func_numberCte
-	| WORDCTE func_constant func_wordCte
-	| SENTENCECTE func_constant func_sentenceCte''' 
+	| BOOLCTE func_boolCte func_constant 
+	| NUMBERCTE func_numberCte func_constant 
+	| WORDCTE func_wordCte func_constant 
+	| SENTENCECTE func_sentenceCte func_constant''' 
 
 def p_type(p) :
 	'''type : BOOL func_type
@@ -224,20 +235,31 @@ def p_func_type(p) :
 def p_func_constant(p) :
 	'func_constant : '
 	if globalScope.isVarFlag:
-		globalScope.pendingOperands.push(p[-1])
+		if globalScope.functionDirectory.constant_memory.get_AddressForConstant(p[-2]) == -1:
+			type = globalScope.operandTypes.top()
+			address = globalScope.functionDirectory.constant_memory.get_nextAddress(type)
+			globalScope.functionDirectory.constant_memory.set_AddressValue(address, p[-2])
+			globalScope.pendingOperands.push(address)
+		else:
+			address = globalScope.functionDirectory.constant_memory.get_AddressForConstant(p[-2])
+			globalScope.functionDirectory.constant_memory.set_AddressValue(address, p[-2])
+			globalScope.pendingOperands.push(address)
 	else:
-		globalScope.varSize = p[-1]
+		globalScope.varSize = p[-2]
 
 def p_func_constantID(p) :
 	'func_constantID : '
-	if globalScope.functionDirectory.varExists(globalScope.functionName, p[-1]):
-		globalScope.pendingOperands.push(p[-1])
-		globalScope.operandTypes.push(globalScope.functionDirectory.getVarType(globalScope.functionName, p[-1]))
+	functionName = globalScope.functionName
+	if globalScope.functionDirectory.varExists(functionName, p[-1]):
+		address = globalScope.functionDirectory.getVarAddress(functionName, p[-1])
+		globalScope.pendingOperands.push(address)
+		globalScope.operandTypes.push(globalScope.functionDirectory.getVarType(functionName, p[-1]))
 	elif globalScope.functionDirectory.functionExists(p[-1]) :
 		globalScope.pendingOperands.push(p[-1])
 		globalScope.operandTypes.push(globalScope.functionDirectory.functionType(p[-1]))
 	elif globalScope.functionName != "Main" and globalScope.functionDirectory.varExists("Main", p[-1]) :
-		globalScope.pendingOperands.push(p[-1])
+		address = globalScope.functionDirectory.getVarAddress("Main", p[-1])
+		globalScope.pendingOperands.push(address)
 		globalScope.operandTypes.push(globalScope.functionDirectory.getVarType("Main", p[-1]))
 	else :
 		sys.exit("ID " + p[-1] + " does not exist")
@@ -275,9 +297,16 @@ def p_func_begin_main(p) :
 def p_func_read(p) :
 	'func_read : '
 	input_id = p[-1]
+	functionName = globalScope.functionName
 
-	if globalScope.functionDirectory.varExists(globalScope.functionName, input_id) or (globalScope.functionName != "Main" and globalScope.functionDirectory.varExists("Main", input_id)) :
-		quadruple = Quad("operator_read", "-1", "-1", input_id)
+	if globalScope.functionDirectory.varExists(functionName, input_id):
+		address = globalScope.functionDirectory.getVarAddress(functionName, input_id)
+		quadruple = Quad("operator_read", "-1", "-1", address)
+		globalScope.quads.append(quadruple)
+		globalScope.quadCount += 1
+	elif functionName != "Main" and globalScope.functionDirectory.varExists("Main", input_id):
+		address = globalScope.functionDirectory.getVarAddress("Main", input_id)
+		quadruple = Quad("operator_read", "-1", "-1", address)
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 	else :
@@ -337,8 +366,7 @@ def p_func_term(p) :
 		resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
 
 		if resultType != None:
-			result = "t" + str(globalScope.tempCount)
-			globalScope.tempCount += 1
+			result = globalScope.functionDirectory.local_memory.get_nextAddress(resultType)
 			globalScope.pendingOperands.push(result)
 			globalScope.operandTypes.push(resultType)
 			quadruple = Quad(operator, leftOp, rightOp, result)
@@ -366,8 +394,7 @@ def p_func_factor(p) :
 		resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
 
 		if resultType != None:
-			result = "t" + str(globalScope.tempCount)
-			globalScope.tempCount += 1
+			result = globalScope.functionDirectory.local_memory.get_nextAddress(resultType)
 			globalScope.pendingOperands.push(result)
 			globalScope.operandTypes.push(resultType)
 			quadruple = Quad(operator, leftOp, rightOp, result)
@@ -400,8 +427,7 @@ def p_func_relop(p) :
 		resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
 
 		if resultType != None:
-			result = "t" + str(globalScope.tempCount)
-			globalScope.tempCount += 1
+			result = globalScope.functionDirectory.local_memory.get_nextAddress(resultType)
 			globalScope.pendingOperands.push(result)
 			globalScope.operandTypes.push(resultType)
 			quadruple = Quad(operator, leftOp, rightOp, result)
@@ -432,8 +458,7 @@ def p_func_logicOP(p) :
 		resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
 
 		if resultType != None:
-			result = "t" + str(globalScope.tempCount)
-			globalScope.tempCount += 1
+			result = globalScope.functionDirectory.local_memory.get_nextAddress(resultType)
 			globalScope.pendingOperands.push(result)
 			globalScope.operandTypes.push(resultType)
 			quadruple = Quad(operator, leftOp, rightOp, result)
@@ -448,8 +473,7 @@ def p_func_logicOP(p) :
 		operator = globalScope.pendingOperators.pop()
 
 		if rightType == "bool":
-			result = "t" + str(globalScope.tempCount)
-			globalScope.tempCount += 1
+			result = globalScope.functionDirectory.local_memory.get_nextAddress("bool")
 			globalScope.pendingOperands.push(result)
 			globalScope.operandTypes.push("bool")
 			quadruple = Quad(operator, "-1", rightOp, result)
@@ -573,8 +597,16 @@ def p_func_endCallFunction(p) :
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 
+		print("Local Memory for: " + globalScope.functionCalled)
+		globalScope.functionDirectory.local_memory.print_Memory()
+		print("-----------------------------")
+
 		globalScope.functionCalled = ""
 		globalScope.parameterCount = 1
+		
+		# CLEAR LOCAL MEMORY
+		globalScope.functionDirectory.local_memory.clear_Memory()
+
 
 # Function to clear global scope variables after program ending
 def p_func_clear(p) :
@@ -593,23 +625,23 @@ yacc.yacc()
 
 # Build the parser
 data = '''kotoba program1;
+	declare number x, number z, bool b, sentence s;
 
-declare number x, bool b, sentence s;
+	function number myfunc(number y, bool w){
+	declare number x;
+	if(y > 2.0) {
+		y = x + 1.0;
+	}
+	return y;
+	}
 
-function number myfunc(number y, bool w){
-    declare number x;
-    if(y > 2.0) {
-        y = y + 1.0;
-    }
-    return y;
-}
-
-begin
-{
-	b = false;
-	call myfunc(x, b);
-}
-end
+	begin
+	{
+		b = false;
+		call myfunc(x, b);
+		x = x * 2.0;
+	}
+	end
 '''
 
 yacc.parse(data)
