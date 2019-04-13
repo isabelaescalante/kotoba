@@ -28,25 +28,25 @@ class Memory:
             if varType == "number":
                 address = (self.num_slot + self.variable_counter[0])
                 self.variable_counter[0] += 1
-                self.set_AddressValue(address, -1) #initialize new address with -1
+                self.set_AddressValue(address, None) #initialize new address with -1
                 return address
             
             if varType == "word":
                 address = (self.word_slot + self.variable_counter[1])
                 self.variable_counter[1] += 1
-                self.set_AddressValue(address, -1) #initialize new address with -1
+                self.set_AddressValue(address, None) #initialize new address with -1
                 return address
 
             if varType == "sentence":
                 address = (self.sentence_slot + self.variable_counter[2])
                 self.variable_counter[2] += 1
-                self.set_AddressValue(address, -1) #initialize new address with -1
+                self.set_AddressValue(address, None) #initialize new address with -1
                 return address
 
             if varType == "bool":
                 address = (self.bool_slot + self.variable_counter[3])
                 self.variable_counter[3] += 1
-                self.set_AddressValue(address, -1) #initialize new address with -1
+                self.set_AddressValue(address, None) #initialize new address with -1
                 return address
             
             else:
