@@ -78,6 +78,20 @@ class Directory:
     def getVarAddress(self, functionName, varName):
         return self.functions[functionName][1][varName][2]
 
+    def getVarValue(self, varAddress):
+        if varAddress >= 1000 and varAddress < 2000:
+            return self.global_memory.get_ValueForAddress(varAddress)
+        elif varAddress >= 2000 and varAddress < 4000:
+            return self.local_memory.get_ValueForAddress(varAddress)
+        elif varAddress >= 4000 and varAddress < 5000:
+            return self.constant_memory.get_ValueForAddress(varAddress)
+
+    def setVarValue(self, varAddress, varValue):
+        if varAddress >= 1000 and varAddress < 2000:
+            return self.global_memory.set_AddressValue(varAddress, varValue)
+        elif varAddress >= 2000 and varAddress < 4000:
+            return self.local_memory.set_AddressValue(varAddress, varValue)
+
     def printDirectory(self):
         print("Function directory")
         for key in self.functions:

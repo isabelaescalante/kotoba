@@ -8,28 +8,8 @@ from dataStruct import Quad
 tokens = LexKotoba.tokens
 
 def p_start(p) :
-	'''start : KOTOBA ID func_start ENDSTMT declare startaux BEGIN func_begin_main block END
-	| KOTOBA ID func_start ENDSTMT startaux BEGIN func_begin_main block END'''
-	
-	print("Compilation succeeded")
-	#print(globalScope.functionDirectory.printDirectory())
-	print("-----------------------------")
-	
-	print("My quads are: ")
-	i = 1
-	for quad in globalScope.quads:
-		print(str(i) + "   " + str(quad.getOperator()) + "\t" + str(quad.getLeftOperator()) + "\t\t" + str(quad.getRightOperator()) + "\t\t" + str(quad.getResult()))
-		#quad.printQuad()
-		i += 1
-	
-	print("-----------------------------")
-	globalScope.functionDirectory.global_memory.print_Memory()
-	print("-----------------------------")
-	globalScope.functionDirectory.local_memory.print_Memory()
-	print("-----------------------------")
-	globalScope.functionDirectory.constant_memory.print_Memory()
-	print("-----------------------------")
-	
+	'''start : KOTOBA ID func_start ENDSTMT declare startaux BEGIN func_begin_main block END func_end
+	| KOTOBA ID func_start ENDSTMT startaux BEGIN func_begin_main block END func_end'''	
 
 def p_startaux(p) :
 	'''startaux : function startaux
@@ -620,26 +600,51 @@ def p_func_clear(p) :
 	globalScope.varType = ""
 	globalScope.varSize = ""
 
+
+# Function to add end program 
+def p_func_end(p) :
+	'func_end : '
+	quadruple = Quad("end", "-1", "-1", "-1")
+	globalScope.quads.append(quadruple)
+	globalScope.quadCount += 1
+
+	print("Compilation succeeded")
+	#print(globalScope.functionDirectory.printDirectory())
+	print("-----------------------------")
+	
+	print("My quads are: ")
+	i = 1
+	for quad in globalScope.quads:
+		print(str(i) + "   " + str(quad.getOperator()) + "\t" + str(quad.getLeftOperator()) + "\t" + str(quad.getRightOperator()) + "\t" + str(quad.getResult()))
+		#quad.printQuad()
+		i += 1
+	
+	print("-----------------------------")
+	globalScope.functionDirectory.global_memory.print_Memory()
+	print("-----------------------------")
+	globalScope.functionDirectory.local_memory.print_Memory()
+	print("-----------------------------")
+	globalScope.functionDirectory.constant_memory.print_Memory()
+	print("-----------------------------")
+
 yacc.yacc()
 
 
 # Build the parser
 data = '''kotoba program1;
-	declare number x, number z, bool b, sentence s;
-
-	function number myfunc(number y, bool w){
-	declare number x;
-	if(y > 2.0) {
-		y = x + 1.0;
-	}
-	return y;
-	}
+	declare number x, number y, number z, bool b, sentence s;
 
 	begin
 	{
 		b = false;
-		call myfunc(x, b);
-		x = x * 2.0;
+		x = 2.0;
+		z = x * 2.0;
+		if (z > x){
+			s = "hello world";
+		}else{
+			s = "inside else";
+		}
+		z = x + y;
 	}
 	end
 '''
