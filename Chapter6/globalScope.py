@@ -20,3 +20,4 @@ pendingOperators = Stack()
 pendingOperands = Stack()
 pendingJumps = Stack()
 operandTypes = Stack()
+instruction_pointer = 0
