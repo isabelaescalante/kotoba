@@ -4,7 +4,7 @@ from dataStruct import Quad
 
 
 def execute_program():
-    instruction_pointer = globalScope.quadCount -1
+    instruction_pointer = globalScope.instruction_pointer
 
     while True:
         current_quad = globalScope.quads[instruction_pointer]
@@ -68,7 +68,24 @@ def execute_program():
             read_operation(current_quad)
             instruction_pointer += 1
             print("Read operation completed")
-
+        elif operator == "operator_goto":
+            instruction_pointer = goto_operation(operator, current_quad)
+            print("Goto operation completed")
+        elif operator == "operator_gotoF":
+            new_ip = goto_operation(operator, current_quad)
+            if new_ip == -1:
+                instruction_pointer += 1
+            else:
+                instruction_pointer = new_ip
+        elif operator == "operator_gotoT":
+            new_ip = goto_operation(operator, current_quad)
+            if new_ip == -1:
+                instruction_pointer += 1
+            else:
+                instruction_pointer = new_ip
+        else:
+            print("Did not find operator")
+            
 
 # Arithmetic Operations
 def arithmetic_operation(operator, current_quad):
@@ -79,20 +96,22 @@ def arithmetic_operation(operator, current_quad):
     left_value = globalScope.functionDirectory.getVarValue(left_op_address)
     right_value = globalScope.functionDirectory.getVarValue(right_op_address)
 
+    print("Left value: " + str(left_value) + " Right value: " + str(right_value))
+
     if left_value == None or right_value == None:
-        sys.exit("Variable has no value")
+        sys.exit("Variable has no value to perform arithmetic operation")
 
     if operator == "operator_add":
-        result_value = left_value + right_value
+        result_value = float(left_value) + float(right_value)
     elif operator == "operator_minus":
-        result_value = left_value + right_value
+        result_value = float(left_value) - float(right_value)
     elif operator == "operator_mult":
-        result_value = left_value * right_value
+        result_value = float(left_value) * float(right_value)
     elif operator == "operator_div":
         if right_value == 0:
             sys.exit("Unable to perform division by 0")
         else:
-            result_value = left_value / right_value
+            result_value = float(left_value) / float(right_value)
     else:
         sys.exit("Error in arithmetic operation")
 
@@ -103,11 +122,12 @@ def arithmetic_operation(operator, current_quad):
 def assign_operation(current_quad):
     address_to_assign = current_quad.getLeftOperator()
     id_address = current_quad.getResult()
+    
+    value_to_assign = globalScope.functionDirectory.getVarValue(address_to_assign)
 
     if value_to_assign == None:
         sys.exit("No value to assign to")
 
-    value_to_assign = globalScope.functionDirectory.getVarValue(address_to_assign)
     globalScope.functionDirectory.setVarValue(id_address, value_to_assign)
     
 # Binary relational Operations
@@ -120,7 +140,7 @@ def bi_relational_operation(operator, current_quad):
     right_value = globalScope.functionDirectory.getVarValue(right_op_address)
 
     if left_value == None or right_value == None:
-        sys.exit("Variable has no value")
+        sys.exit("Variable has no value to perform realtional operation")
     
     if operator == "operator_greater":
         result_value = left_value > right_value
@@ -143,7 +163,7 @@ def not_operation(current_quad):
     left_value = globalScope.functionDirectory.getVarValue(left_op_address)
 
     if left_value == None:
-        sys.exit("Variable has no value")
+        sys.exit("Variable has no value to perform not operation")
 
     result_value = not left_value
     globalScope.functionDirectory.setVarValue(result_address, result_value)
@@ -158,7 +178,7 @@ def logical_operation(operator, current_quad):
     right_value = globalScope.functionDirectory.getVarValue(right_op_address)
 
     if left_value == None or right_value == None:
-        sys.exit("Variable has no value")
+        sys.exit("Variable has no value to perform logical operation")
     
     if operator == "operator_and":
         result_value = left_value and right_value
@@ -185,3 +205,33 @@ def read_operation(current_quad):
     id_value = globalScope.functionDirectory.getVarValue(id_address)
 
     # PENDING ACTIONS
+
+# Goto operations
+def goto_operation(operator, current_quad):
+    goto_jump = current_quad.getResult() - 1
+
+    if operator == "operator_goto":
+        return goto_jump
+    elif operator == "operator_gotoF":
+        exp_address = current_quad.getLeftOperator()
+        exp_value = globalScope.functionDirectory.getVarValue(exp_address)
+
+        if exp_value == None:
+            sys.exit("Variable has no value to be evaluated with")
+        
+        if not exp_value:
+            return goto_jump
+        else:
+            return -1
+    elif operator == "operator_gotoT":
+        exp_address = current_quad.getLeftOperand()
+        exp_value = globalScope.functionDirectory.getVarValue(exp_address)
+
+        if exp_value == None:
+            sys.exit("Variable has no value to be evaluated with")
+        
+        if exp_value:
+            return goto_jump
+        else:
+            return -1
+
