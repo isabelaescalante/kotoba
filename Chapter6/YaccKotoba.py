@@ -638,8 +638,8 @@ data = '''kotoba program1;
 	{
 		b = false;
 		x = 2.0;
-		z = x * 2.0;
-		if (z > x){
+		y = x * 2.0;
+		if (y > x){
 			s = "hello world";
 		}else{
 			s = "inside else";
