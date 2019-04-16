@@ -141,7 +141,7 @@ def p_parameteraux(p) :
 	| empty'''
 
 def p_returnaux(p) :
-	'''returnaux : RETURN ID
+	'''returnaux : RETURN ID func_return
 	| empty'''
 
 def p_callfunction(p) :
@@ -576,9 +576,20 @@ def p_func_endCallFunction(p) :
 		globalScope.functionCalled = ""
 		globalScope.parameterCount = 1
 
+def p_func_return(p) :
+	'func_return : '
+	if globalScope.functionDirectory.functionType(globalScope.functionName) != "void":
+		quadruple = Quad("operator_return", p[-1], "-1", "-1")
+		globalScope.quads.append(quadruple)
+		globalScope.quadCount += 1
+
 # Function to clear global scope variables after program ending
 def p_func_clear(p) :
 	'func_clear : '
+	quadruple = Quad("operator_endfunc", "-1", "-1", "-1")
+	globalScope.quads.append(quadruple)
+	globalScope.quadCount += 1
+
 	globalScope.pendingOperators.empty()
 	globalScope.pendingOperands.empty()
 	globalScope.operandTypes.empty()
@@ -597,7 +608,7 @@ data = '''kotoba program1;
 declare number x, bool b, sentence s;
 
 function number myfunc(number y, bool w){
-    declare number x;
+    declare number x, sentence z;
     if(y > 2.0) {
         y = y + 1.0;
     }

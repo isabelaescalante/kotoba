@@ -69,7 +69,7 @@ Rule 63    parameter -> type ID func_declare_par parameteraux
 Rule 64    parameter -> type ID OPENBRAC func_isSize cte CLOSEBRAC func_declare_array parameteraux
 Rule 65    parameteraux -> COMA parameter
 Rule 66    parameteraux -> empty
-Rule 67    returnaux -> RETURN ID
+Rule 67    returnaux -> RETURN ID func_return
 Rule 68    returnaux -> empty
 Rule 69    callfunction -> CALL ID DOT special OPENPAREN spaux CLOSEPAREN ENDSTMT
 Rule 70    callfunction -> CALL ID func_callFunc OPENPAREN spaux CLOSEPAREN func_endCallFunction ENDSTMT
@@ -125,7 +125,8 @@ Rule 119   func_endWhile -> <empty>
 Rule 120   func_callFunc -> <empty>
 Rule 121   func_callFuncParameter -> <empty>
 Rule 122   func_endCallFunction -> <empty>
-Rule 123   func_clear -> <empty>
+Rule 123   func_return -> <empty>
+Rule 124   func_clear -> <empty>
 
 Terminals, with rules where they appear
 
@@ -232,6 +233,7 @@ func_print           : 13 14
 func_read            : 11
 func_relop           : 46 46
 func_relop_operation : 46
+func_return          : 67
 func_sentenceCte     : 30
 func_start           : 1 2
 func_term            : 48 49
@@ -3760,7 +3762,7 @@ state 184
 state 185
 
     (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux . returnaux ENDSTMT CLOSECURL func_clear
-    (67) returnaux -> . RETURN ID
+    (67) returnaux -> . RETURN ID func_return
     (68) returnaux -> . empty
     (84) empty -> .
 
@@ -3974,7 +3976,7 @@ state 202
 state 203
 
     (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux . returnaux ENDSTMT CLOSECURL func_clear
-    (67) returnaux -> . RETURN ID
+    (67) returnaux -> . RETURN ID func_return
     (68) returnaux -> . empty
     (84) empty -> .
 
@@ -3993,7 +3995,7 @@ state 204
 
 state 205
 
-    (67) returnaux -> RETURN . ID
+    (67) returnaux -> RETURN . ID func_return
 
     ID              shift and go to state 222
 
@@ -4231,10 +4233,12 @@ state 221
 
 state 222
 
-    (67) returnaux -> RETURN ID .
+    (67) returnaux -> RETURN ID . func_return
+    (123) func_return -> .
 
-    ENDSTMT         reduce using rule 67 (returnaux -> RETURN ID .)
+    ENDSTMT         reduce using rule 123 (func_return -> .)
 
+    func_return                    shift and go to state 235
 
 state 223
 
@@ -4244,7 +4248,7 @@ state 223
     COMA            reduce using rule 88 (func_declare_array -> .)
     CLOSEPAREN      reduce using rule 88 (func_declare_array -> .)
 
-    func_declare_array             shift and go to state 235
+    func_declare_array             shift and go to state 236
 
 state 224
 
@@ -4304,7 +4308,7 @@ state 227
 
     OPENCURL        shift and go to state 34
 
-    block                          shift and go to state 236
+    block                          shift and go to state 237
 
 state 228
 
@@ -4332,7 +4336,7 @@ state 229
 
     (58) cycle -> DO func_do block WHILE OPENPAREN expression CLOSEPAREN func_endDoWhile . ENDSTMT
 
-    ENDSTMT         shift and go to state 237
+    ENDSTMT         shift and go to state 238
 
 
 state 230
@@ -4390,20 +4394,27 @@ state 233
 
     (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT . CLOSECURL func_clear
 
-    CLOSECURL       shift and go to state 238
+    CLOSECURL       shift and go to state 239
 
 
 state 234
 
     (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL . func_clear
-    (123) func_clear -> .
+    (124) func_clear -> .
 
-    FUNC            reduce using rule 123 (func_clear -> .)
-    BEGIN           reduce using rule 123 (func_clear -> .)
+    FUNC            reduce using rule 124 (func_clear -> .)
+    BEGIN           reduce using rule 124 (func_clear -> .)
 
-    func_clear                     shift and go to state 239
+    func_clear                     shift and go to state 240
 
 state 235
+
+    (67) returnaux -> RETURN ID func_return .
+
+    ENDSTMT         reduce using rule 67 (returnaux -> RETURN ID func_return .)
+
+
+state 236
 
     (64) parameter -> type ID OPENBRAC func_isSize cte CLOSEBRAC func_declare_array . parameteraux
     (65) parameteraux -> . COMA parameter
@@ -4413,10 +4424,10 @@ state 235
     COMA            shift and go to state 187
     CLOSEPAREN      reduce using rule 84 (empty -> .)
 
-    parameteraux                   shift and go to state 240
+    parameteraux                   shift and go to state 241
     empty                          shift and go to state 188
 
-state 236
+state 237
 
     (56) condition -> IF OPENPAREN expression CLOSEPAREN func_if block ELSE func_else block . func_endElse
     (114) func_endElse -> .
@@ -4438,9 +4449,9 @@ state 236
     RETURN          reduce using rule 114 (func_endElse -> .)
     ENDSTMT         reduce using rule 114 (func_endElse -> .)
 
-    func_endElse                   shift and go to state 241
+    func_endElse                   shift and go to state 242
 
-state 237
+state 238
 
     (58) cycle -> DO func_do block WHILE OPENPAREN expression CLOSEPAREN func_endDoWhile ENDSTMT .
 
@@ -4462,17 +4473,17 @@ state 237
     ENDSTMT         reduce using rule 58 (cycle -> DO func_do block WHILE OPENPAREN expression CLOSEPAREN func_endDoWhile ENDSTMT .)
 
 
-state 238
+state 239
 
     (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL . func_clear
-    (123) func_clear -> .
+    (124) func_clear -> .
 
-    FUNC            reduce using rule 123 (func_clear -> .)
-    BEGIN           reduce using rule 123 (func_clear -> .)
+    FUNC            reduce using rule 124 (func_clear -> .)
+    BEGIN           reduce using rule 124 (func_clear -> .)
 
-    func_clear                     shift and go to state 242
+    func_clear                     shift and go to state 243
 
-state 239
+state 240
 
     (60) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear .
 
@@ -4480,14 +4491,14 @@ state 239
     BEGIN           reduce using rule 60 (function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear .)
 
 
-state 240
+state 241
 
     (64) parameter -> type ID OPENBRAC func_isSize cte CLOSEBRAC func_declare_array parameteraux .
 
     CLOSEPAREN      reduce using rule 64 (parameter -> type ID OPENBRAC func_isSize cte CLOSEBRAC func_declare_array parameteraux .)
 
 
-state 241
+state 242
 
     (56) condition -> IF OPENPAREN expression CLOSEPAREN func_if block ELSE func_else block func_endElse .
 
@@ -4509,7 +4520,7 @@ state 241
     ENDSTMT         reduce using rule 56 (condition -> IF OPENPAREN expression CLOSEPAREN func_if block ELSE func_else block func_endElse .)
 
 
-state 242
+state 243
 
     (59) function -> FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear .
 
