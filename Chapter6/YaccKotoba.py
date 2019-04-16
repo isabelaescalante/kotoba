@@ -132,7 +132,7 @@ def p_parameteraux(p) :
 	| empty'''
 
 def p_returnaux(p) :
-	'''returnaux : RETURN ID
+	'''returnaux : RETURN ID func_return
 	| empty'''
 
 def p_callfunction(p) :
@@ -588,9 +588,20 @@ def p_func_endCallFunction(p) :
 		globalScope.functionDirectory.local_memory.clear_Memory()
 
 
+def p_func_return(p) :
+	'func_return : '
+	if globalScope.functionDirectory.functionType(globalScope.functionName) != "void":
+		quadruple = Quad("operator_return", p[-1], "-1", "-1")
+		globalScope.quads.append(quadruple)
+		globalScope.quadCount += 1
+
 # Function to clear global scope variables after program ending
 def p_func_clear(p) :
 	'func_clear : '
+	quadruple = Quad("operator_endfunc", "-1", "-1", "-1")
+	globalScope.quads.append(quadruple)
+	globalScope.quadCount += 1
+
 	globalScope.pendingOperators.empty()
 	globalScope.pendingOperands.empty()
 	globalScope.operandTypes.empty()
