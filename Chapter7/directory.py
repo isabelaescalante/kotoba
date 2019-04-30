@@ -86,6 +86,9 @@ class Directory:
     def getVarAddress(self, functionName, varName):
         return self.functions[functionName][1][varName][2]
 
+    def getVarSize(self, functionName, varName):
+        return self.functions[functionName][1][varName][1]
+        
     def getVarValue(self, varAddress):
         if varAddress >= 1000 and varAddress < 2000:
             return self.global_memory.get_ValueForAddress(varAddress)

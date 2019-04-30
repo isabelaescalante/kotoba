@@ -54,7 +54,7 @@ def p_assign(p) :
 
 def p_assignaux(p) :
 	'''assignaux : exp func_assign_value ENDSTMT
-	| OPENCURL assiaux CLOSECURL ENDSTMT'''
+	| OPENCURL assiaux CLOSECURL ENDSTMT func_assign_array_end'''
 
 def p_assiaux(p) :
 	'''assiaux : exp func_assign_array
@@ -235,6 +235,7 @@ def p_func_constantID(p) :
 		address = globalScope.functionDirectory.getVarAddress(functionName, p[-1])
 		globalScope.pendingOperands.push(address)
 		globalScope.operandTypes.push(globalScope.functionDirectory.getVarType(functionName, p[-1]))
+		globalScope.varName = p[-1]
 	elif globalScope.functionDirectory.functionExists(p[-1]) :
 		globalScope.pendingOperands.push(p[-1])
 		globalScope.operandTypes.push(globalScope.functionDirectory.functionType(p[-1]))
@@ -248,11 +249,17 @@ def p_func_constantID(p) :
 def p_func_constantIDArray(p) :
 	'func_constantIDArray : '
 	functionName = globalScope.functionName
+	globalScope.varName = p[-4]
 	if globalScope.functionDirectory.varExists(functionName, p[-4]):
-		if p[-2] < globalScope.functionDirectory.functions[functionName][1][p[-4]][1] and p[-2] > 0:
-			address = globalScope.functionDirectory.getVarAddress(functionName, p[-4]) + p[-2]
+		if int(float(p[-2])) < globalScope.functionDirectory.functions[functionName][1][p[-4]][1] and int(float(p[-2])) > -1:
+			address = globalScope.functionDirectory.getVarAddress(functionName, p[-4]) + int(float(p[-2]))
 			globalScope.pendingOperands.push(address)
 			globalScope.operandTypes.push(globalScope.functionDirectory.getVarType(functionName, p[-4]))
+		else :
+			sys.exit("Out of range for size of variable " + p[-4])
+	else :
+		sys.exit("ID " + p[-4] + " does not exist")
+
 
 def p_func_boolCte(p) :
 	'func_boolCte : '
@@ -337,7 +344,35 @@ def p_func_assign_value(p) :
 
 def p_func_assign_array(p) :
 	'func_assign_array : '
-			
+	if not globalScope.pendingOperators.isEmpty() and globalScope.pendingOperators.top() == "operator_assign":
+		if globalScope.arrayIndexCounter < globalScope.functionDirectory.getVarSize(globalScope.functionName, globalScope.varName):
+			# value
+			rightOp = globalScope.pendingOperands.pop()
+			rightType = globalScope.operandTypes.pop()
+			# id with assigned value
+			leftOp = globalScope.pendingOperands.top() + globalScope.arrayIndexCounter
+			leftType = globalScope.operandTypes.top()
+		
+			operator = globalScope.pendingOperators.top()
+			resultType = globalScope.semanticCube.verification(operator, leftType, rightType)
+			globalScope.arrayIndexCounter += 1
+
+			if resultType != None:
+				quadruple = Quad(operator, rightOp, "-1", leftOp)
+				globalScope.quads.append(quadruple)
+				globalScope.quadCount += 1
+			else:
+				sys.exit("Unable to assign value of type " + rightType + " to ID of type " + leftType)
+
+def p_func_assign_array_end(p) :
+	'func_assign_array_end : '
+	if globalScope.arrayIndexCounter < globalScope.functionDirectory.getVarSize(globalScope.functionName, globalScope.varName):
+		sys.exit("Incorrect amount of values for array")
+	else :
+		globalScope.pendingOperands.pop()
+		globalScope.operandTypes.pop()
+		globalScope.pendingOperators.top()
+		globalScope.arrayIndexCounter = 0
 
 # Functions for Arithmetic Expressions
 def p_func_term_operation(p) :
@@ -655,11 +690,12 @@ yacc.yacc()
 
 # Build the parser
 data = '''kotoba program1;
-	declare bool b[2.0];
+	declare number z, bool b[3.0];
 
 	begin
 	{
-		set b = {true, false};
+		set z = 2.0 * 4.0;
+		set b = {true, false, false};
 	}
 	end
 '''
