@@ -255,11 +255,18 @@ def p_func_constantIDArray(p) :
 			address = globalScope.functionDirectory.getVarAddress(functionName, p[-4]) + int(float(p[-2]))
 			globalScope.pendingOperands.push(address)
 			globalScope.operandTypes.push(globalScope.functionDirectory.getVarType(functionName, p[-4]))
+
+			quadruple = Quad("operator_verify", "0", globalScope.functionDirectory.functions[functionName][1][p[-4]][1], p[-2])
+			globalScope.quads.append(quadruple)
+
+			quadruple = Quad("operator_add", p[-2], globalScope.functionDirectory.getVarAddress(functionName, p[-4]), address)
+			globalScope.quads.append(quadruple)
+
+			globalScope.quadCount += 2
 		else :
 			sys.exit("Out of range for size of variable " + p[-4])
 	else :
 		sys.exit("ID " + p[-4] + " does not exist")
-
 
 def p_func_boolCte(p) :
 	'func_boolCte : '
@@ -297,12 +304,12 @@ def p_func_read(p) :
 
 	if globalScope.functionDirectory.varExists(functionName, input_id):
 		address = globalScope.functionDirectory.getVarAddress(functionName, input_id)
-		quadruple = Quad("operator_read", "-1", "-1", address)
+		quadruple = Quad("operator_read", globalScope.functionDirectory.getVarType(functionName, p[-1]), "-1", address)
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 	elif functionName != "Main" and globalScope.functionDirectory.varExists("Main", input_id):
 		address = globalScope.functionDirectory.getVarAddress("Main", input_id)
-		quadruple = Quad("operator_read", "-1", "-1", address)
+		quadruple = Quad("operator_read", globalScope.functionDirectory.getVarType(functionName, p[-1]), "-1", address)
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 	else :
@@ -599,7 +606,7 @@ def p_func_callFunc(p) :
 		globalScope.functionCalled = p[-1]
 
 		globalScope.pendingOperands.push(p[-1])
-		quadruple = Quad("operator_era", p[-1], "-1", "-1")
+		quadruple = Quad("operator_era", "-1", "-1", p[-1])
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 	else :
@@ -621,7 +628,7 @@ def p_func_callFuncParameter(p) :
 def p_func_endCallFunction(p) :
 	'func_endCallFunction : '
 	if globalScope.functionCalled == globalScope.pendingOperands.pop() :
-		quadruple = Quad("operator_gosub", globalScope.functionCalled, "-1", "-1")
+		quadruple = Quad("operator_gosub", "-1", "-1",globalScope.functionCalled)
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 
@@ -639,7 +646,7 @@ def p_func_endCallFunction(p) :
 def p_func_return(p) :
 	'func_return : '
 	if globalScope.functionDirectory.functionType(globalScope.functionName) != "void":
-		quadruple = Quad("operator_return", p[-1], "-1", "-1")
+		quadruple = Quad("operator_return", "-1", "-1", p[-1])
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 
@@ -690,12 +697,22 @@ yacc.yacc()
 
 # Build the parser
 data = '''kotoba program1;
-	declare number z, bool b[3.0];
+	declare number z, bool b[3.0], number x[2.0];
+
+	function number myfunc(number y) {
+		declare number z;
+		set y = y + 1.0;
+		return y;
+	}
 
 	begin
 	{
-		set z = 2.0 * 4.0;
+		kread(z);
+		set x = {2.0, 3.0};
+		set z = 2.0 * x[1.0];
+		set z = x[0.0] - 3.34;
 		set b = {true, false, false};
+		call myfunc(z);
 	}
 	end
 '''

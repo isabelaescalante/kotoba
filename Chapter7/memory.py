@@ -50,7 +50,7 @@ class Memory:
                 return address
             
             else:
-                return -1
+                print("Memory is full")
 
 
     def set_AddressValue(self, address, varValue):
