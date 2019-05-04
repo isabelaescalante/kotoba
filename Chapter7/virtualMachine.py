@@ -83,6 +83,8 @@ def execute_program():
                 instruction_pointer += 1
             else:
                 instruction_pointer = new_ip
+        elif operator == "operator_era":
+            new_ip = 
         else:
             print("Did not find operator")
             
@@ -197,14 +199,38 @@ def print_operation(current_quad):
     if id_value == None:
         sys.exit("Variable has no value to print")
 
-    # PENDING ACTIONS
+    print id_value
 
 # Read operation
 def read_operation(current_quad):
     id_address = current_quad.getResult()
     id_value = globalScope.functionDirectory.getVarValue(id_address)
+    id_type = current_quad.getLeftOperator()
 
-    # PENDING ACTIONS
+    input_value = input()
+
+    if id_type == "number":
+        try:
+            input_value = float(input_value)
+            globalScope.functionDirectory.setVarValue(id_address, input_value)
+        except:
+            sys.exit("Wrong input for number")
+    if id_type == "bool":
+        if input_value == "true" or input_value == "false":
+            globalScope.functionDirectory.setVarValue(id_address, input_value)
+        else:
+            sys.exit("Wrong input for bool")
+    if id_type == "word":
+        if !(' ' in input_value) :
+            globalScope.functionDirectory.setVarValue(id_address, input_value)
+        else:
+            sys.exit("Wrong input for word")
+    if id_type == "sentence":
+        if ' ' in input_value :
+            globalScope.functionDirectory.setVarValue(id_address, input_value)
+        else:
+            sys.exit("Wrong input for sentence")
+
 
 # Goto operations
 def goto_operation(operator, current_quad):
