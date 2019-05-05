@@ -616,9 +616,10 @@ def p_func_callFuncParameter(p) :
 	'func_callFuncParameter : '
 	parameterVar = globalScope.pendingOperands.pop()
 	parameterType = globalScope.operandTypes.pop()
+	parameterAddress = globalScope.functionDirectory.getVarAddress(globalScope.functionName, parameterVar)
 
 	if parameterType == globalScope.functionDirectory.functions[globalScope.functionCalled][2][globalScope.parameterCount - 1] :
-		quadruple = Quad("operator_param", parameterVar, "-1", "param" + str(globalScope.parameterCount))
+		quadruple = Quad("operator_param", parameterAddress, "-1", "param" + str(globalScope.parameterCount))
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 		globalScope.parameterCount += 1
@@ -697,7 +698,7 @@ yacc.yacc()
 
 # Build the parser
 data = '''kotoba program1;
-	declare number z, bool b[3.0], number x[2.0];
+	declare number z, bool b[3.0], number x[2.0], number n;
 
 	function number myfunc(number y) {
 		declare number z;
@@ -712,7 +713,7 @@ data = '''kotoba program1;
 		set z = 2.0 * x[1.0];
 		set z = x[0.0] - 3.34;
 		set b = {true, false, false};
-		call myfunc(z);
+		set n = call myfunc(z);
 	}
 	end
 '''
