@@ -133,7 +133,12 @@ def arithmetic_operation(operator, current_quad):
         sys.exit("Variable has no value to perform arithmetic operation")
 
     if operator == "operator_add":
-        result_value = float(left_value) + float(right_value)
+        try:
+            result_value = float(left_value) + float(right_value)
+        except:
+            result_value = left_value + right_value
+            result_value = result_value.replace('""', ' ')
+
     elif operator == "operator_minus":
         result_value = float(left_value) - float(right_value)
     elif operator == "operator_mult":
@@ -326,6 +331,8 @@ def gosub_operation(current_quad, current_ip):
     return_ip.push(current_ip + 1)
     func_called = current_quad.getResult()
     param_count = 0
+
+    print("fib quad " + str(globalScope.functionDirectory.getFuncQuadPosition(func_called) - 1))
     return globalScope.functionDirectory.getFuncQuadPosition(func_called) - 1
 
 def return_operation(current_quad) :
@@ -336,6 +343,6 @@ def return_operation(current_quad) :
     pending_return_value.push(return_value)
     new_ip = return_ip.pop()
 
-    globalScope.functionDirectory.local_memory.clear_Memory()
+    # globalScope.functionDirectory.local_memory.clear_Memory()
 
     return new_ip

@@ -80,7 +80,8 @@ def p_statement(p) :
 	| expression
 	| condition
 	| cycle
-	| callfunction'''
+	| callfunction
+	| returnaux'''
 
 def p_expression(p) :
 	'''expression : logexpression
@@ -118,8 +119,8 @@ def p_cycle(p) :
 	| DO func_do block WHILE OPENPAREN expression CLOSEPAREN func_endDoWhile ENDSTMT'''
 
 def p_function(p) :
-	'''function : FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
-	| FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL'''
+	'''function : FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux CLOSECURL
+	| FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux CLOSECURL'''
 
 def p_funcaux(p) :
 	'''funcaux : type
@@ -135,8 +136,7 @@ def p_parameteraux(p) :
 	| empty'''
 
 def p_returnaux(p) :
-	'''returnaux : RETURN ID func_return
-	| RETURN func_return'''
+	'''returnaux : RETURN expression func_return ENDSTMT'''
 
 def p_callfunction(p) :
 	'''callfunction : CALL ID DOT special OPENPAREN spaux CLOSEPAREN func_callSpecial ENDSTMT
@@ -675,7 +675,7 @@ def p_func_callSpecial(p) :
 def p_func_return(p) :
 	'func_return : '
 	if globalScope.functionDirectory.functionType(globalScope.functionName) != "void":
-		address = globalScope.functionDirectory.getVarAddress(globalScope.functionName, p[-1])
+		address = globalScope.pendingOperands.pop()
 		quadruple = Quad("operator_return", "-1", "-1", address)
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
