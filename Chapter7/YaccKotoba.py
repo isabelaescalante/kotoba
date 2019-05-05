@@ -54,7 +54,8 @@ def p_assign(p) :
 
 def p_assignaux(p) :
 	'''assignaux : exp func_assign_value ENDSTMT
-	| OPENCURL assiaux CLOSECURL ENDSTMT func_assign_array_end'''
+	| OPENCURL assiaux CLOSECURL ENDSTMT func_assign_array_end
+	| callfunction func_assign_value'''
 
 def p_assiaux(p) :
 	'''assiaux : exp func_assign_array
@@ -117,16 +118,17 @@ def p_cycle(p) :
 	| DO func_do block WHILE OPENPAREN expression CLOSEPAREN func_endDoWhile ENDSTMT'''
 
 def p_function(p) :
-	'''function : FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL func_clear
-	| FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL func_clear'''
+	'''function : FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
+	| FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL'''
 
 def p_funcaux(p) :
 	'''funcaux : type
-	| VOID'''
+	| VOID func_type'''
 
 def p_parameter(p) :
 	'''parameter : type ID func_declare_par parameteraux
-	| type ID OPENBRAC func_isSize cte CLOSEBRAC func_declare_array parameteraux'''
+	| type ID OPENBRAC func_isSize cte CLOSEBRAC func_declare_array parameteraux
+	| empty'''
 
 def p_parameteraux(p) :
 	'''parameteraux : COMA parameter
@@ -134,28 +136,29 @@ def p_parameteraux(p) :
 
 def p_returnaux(p) :
 	'''returnaux : RETURN ID func_return
-	| empty'''
+	| RETURN func_return'''
 
 def p_callfunction(p) :
-	'''callfunction : CALL ID DOT special OPENPAREN spaux CLOSEPAREN ENDSTMT
+	'''callfunction : CALL ID DOT special OPENPAREN spaux CLOSEPAREN func_callSpecial ENDSTMT
 	| CALL ID func_callFunc OPENPAREN spaux CLOSEPAREN func_endCallFunction ENDSTMT'''
 
 def p_spaux(p) :
-	'''spaux : cte func_callFuncParameter  
+	'''spaux : cte func_callFuncParameter
 	| cte func_callFuncParameter COMA spaux
 	| empty'''
 
 def p_special(p) :
-	'''special : LENGTH  
-	| FREQUENCY
-    | SEARCH
-    | EXISTS
-    | MEAN
-	| MEDIAN
-	| MODE
-	| WORDCOUNT
-	| TOKENIZE
-	| REMOVE'''
+	'''special : LENGTH func_special
+	| FREQUENCY func_special
+    | SEARCH func_special
+    | EXISTS func_special
+    | MEAN func_special
+	| MEDIAN func_special
+	| MODE func_special
+	| WORDCOUNT func_special
+	| TOKENIZE func_special
+	| REMOVE func_special
+	| SORT func_special''' 
 
 def p_empty(p) :
 	'''empty : '''
@@ -197,7 +200,9 @@ def p_func_declare_par(p) :
 	'func_declare_par : '
 	if not globalScope.functionDirectory.addVariable(globalScope.functionName, p[-1], globalScope.varType, 1) :
 		sys.exit("Error: Variable ID " + p[-1] + " already exists")
-	if not globalScope.functionDirectory.addParameter(globalScope.functionName, globalScope.varType) :
+	
+	address = globalScope.functionDirectory.getVarAddress(globalScope.functionName, p[-1])
+	if not globalScope.functionDirectory.addParameter(globalScope.functionName, [globalScope.varType, address]) :
 		sys.exit("Error: Parameter of type " + p[-1] + " cannot be added")
 
 # Function to declare functions and its attributes
@@ -206,7 +211,7 @@ def p_func_declare_function(p) :
 	if globalScope.functionDirectory.addFunction(p[-1], globalScope.varType, globalScope.quadCount) :
 		globalScope.functionName = p[-1]
 	else :
-		sys.exit("Error: Function ID already exists")
+		sys.exit("Error: Function ID " + p[-1] + " already exists")
 
 def p_func_type(p) :
 	'func_type : '
@@ -617,7 +622,9 @@ def p_func_callFuncParameter(p) :
 	parameterVar = globalScope.pendingOperands.pop()
 	parameterType = globalScope.operandTypes.pop()
 
-	if parameterType == globalScope.functionDirectory.functions[globalScope.functionCalled][2][globalScope.parameterCount - 1] :
+	if globalScope.isSpecial :
+		globalScope.varName = parameterVar
+	elif parameterType == globalScope.functionDirectory.functions[globalScope.functionCalled][2][globalScope.parameterCount - 1][0] :
 		quadruple = Quad("operator_param", parameterVar, "-1", "param" + str(globalScope.parameterCount))
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
@@ -627,44 +634,73 @@ def p_func_callFuncParameter(p) :
 
 def p_func_endCallFunction(p) :
 	'func_endCallFunction : '
-	if globalScope.functionCalled == globalScope.pendingOperands.pop() :
+	if globalScope.functionCalled == globalScope.pendingOperands.pop() and globalScope.parameterCount - 1 == len(globalScope.functionDirectory.functions[globalScope.functionCalled][2]):
 		quadruple = Quad("operator_gosub", "-1", "-1",globalScope.functionCalled)
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 
+		print(globalScope.functionDirectory.functions[globalScope.functionCalled][0])
+		if globalScope.functionDirectory.functions[globalScope.functionCalled][0] != "void" :
+			globalScope.pendingOperands.push("(" + globalScope.functionCalled + ")")
+			globalScope.operandTypes.push(globalScope.functionDirectory.functions[globalScope.functionCalled][0])
+
 		print("Local Memory for: " + globalScope.functionCalled)
 		globalScope.functionDirectory.local_memory.print_Memory()
 		print("-----------------------------")
-
 		globalScope.functionCalled = ""
 		globalScope.parameterCount = 1
 		
 		# CLEAR LOCAL MEMORY
 		globalScope.functionDirectory.local_memory.clear_Memory()
 
+def p_func_special(p) :
+	'func_special : '
+	globalScope.funcSpecial = p[-1]
+	globalScope.isSpecial = True
+
+def p_func_callSpecial(p) :
+	'func_callSpecial : '
+	if globalScope.functionDirectory.varExists(globalScope.functionName, p[-6]) :
+		address = globalScope.functionDirectory.getVarAddress(globalScope.functionName, p[-6])
+
+		if p[-2] == "":
+			quadruple = Quad("operator_special", address, "-1", globalScope.funcSpecial)
+			globalScope.quads.append(quadruple)
+		else :			
+			quadruple = Quad("operator_special", address, globalScope.varName, globalScope.funcSpecial)
+			globalScope.quads.append(quadruple)
+			globalScope.quadCount += 1	
+
+	globalScope.isSpecial = False	
 
 def p_func_return(p) :
 	'func_return : '
 	if globalScope.functionDirectory.functionType(globalScope.functionName) != "void":
-		quadruple = Quad("operator_return", "-1", "-1", p[-1])
+		address = globalScope.functionDirectory.getVarAddress(globalScope.functionName, p[-1])
+		quadruple = Quad("operator_return", "-1", "-1", address)
+		globalScope.quads.append(quadruple)
+		globalScope.quadCount += 1
+	else :
+		quadruple = Quad("operator_return", "-1", "-1", "void")
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 
-# Function to clear global scope variables after program ending
-def p_func_clear(p) :
-	'func_clear : '
-	quadruple = Quad("operator_endfunc", "-1", "-1", "-1")
-	globalScope.quads.append(quadruple)
-	globalScope.quadCount += 1
 
-	globalScope.pendingOperators.empty()
-	globalScope.pendingOperands.empty()
-	globalScope.operandTypes.empty()
-	globalScope.isVarFlag = True
-	globalScope.functionName = ""
-	globalScope.varName = ""
-	globalScope.varType = ""
-	globalScope.varSize = ""
+# # Function to clear global scope variables after program ending
+# def p_func_clear(p) :
+# 	'func_clear : '
+# 	quadruple = Quad("operator_endfunc", "-1", "-1", "-1")
+# 	globalScope.quads.append(quadruple)
+# 	globalScope.quadCount += 1
+
+# 	globalScope.pendingOperators.empty()
+# 	globalScope.pendingOperands.empty()
+# 	globalScope.operandTypes.empty()
+# 	globalScope.isVarFlag = True
+# 	globalScope.functionName = ""
+# 	globalScope.varName = ""
+# 	globalScope.varType = ""
+# 	globalScope.varSize = ""
 
 
 # Function to add end program 
@@ -675,7 +711,7 @@ def p_func_end(p) :
 	globalScope.quadCount += 1
 
 	print("Compilation succeeded")
-	print(globalScope.functionDirectory.printDirectory())
+	globalScope.functionDirectory.printDirectory()
 	print("-----------------------------")
 	
 	print("My quads are: ")
@@ -707,12 +743,13 @@ data = '''kotoba program1;
 
 	begin
 	{
+		set z = call myfunc(z);
+		call z.frequency(1.0);
 		kread(z);
 		set x = {2.0, 3.0};
 		set z = 2.0 * x[1.0];
 		set z = x[0.0] - 3.34;
 		set b = {true, false, false};
-		call myfunc(z);
 	}
 	end
 '''

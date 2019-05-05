@@ -231,7 +231,6 @@ def read_operation(current_quad):
         else:
             sys.exit("Wrong input for sentence")
 
-
 # Goto operations
 def goto_operation(operator, current_quad):
     goto_jump = current_quad.getResult() - 1
@@ -260,4 +259,3 @@ def goto_operation(operator, current_quad):
             return goto_jump
         else:
             return -1
-
