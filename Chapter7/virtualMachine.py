@@ -1,7 +1,11 @@
 import sys
 import globalScope
 from dataStruct import Quad
+from dataStruct import Stack
 
+current_function_name = Stack()
+return_ip = Stack()
+param_count = 0
 
 def execute_program():
     instruction_pointer = globalScope.instruction_pointer
@@ -84,7 +88,22 @@ def execute_program():
             else:
                 instruction_pointer = new_ip
         elif operator == "operator_era":
-            new_ip = 
+            era_operation(current_quad)
+            instruction_pointer += 1 
+            print("Era operation completed")
+        elif operator == "operator_param":
+            param_operation(current_quad)
+            instruction_pointer += 1 
+            print("Param operation completed")
+        elif operator == "operator_gosub":
+            instruction_pointer = gosub_operation(current_quad, instruction_pointer)
+            print("Gosub operation completed")
+        elif operator == "operator_return":
+            instruction_pointer += 1 
+            print("Return operation completed")
+        elif operator == "operator_ver":
+            instruction_pointer += 1 
+            print("Verification operation completed")
         else:
             print("Did not find operator")
             
@@ -261,3 +280,20 @@ def goto_operation(operator, current_quad):
         else:
             return -1
 
+def era_operation(current_quad):
+    current_function_name.push(current_quad.getResult())
+
+def param_operation(current_quad):
+    param_address = current_quad.getLeftOperator()
+    param_value = globalScope.functionDirectory.getVarValue(param_address)
+
+    function_param_address = globalScope.functionDirectory.functions[current_function_name][2][param_count][1]
+    globalScope.functionDirectory.setVarValue(function_param_address)
+    param_count += 1 
+
+
+def gpsub_operation(current_quad, current_ip):
+    return_ip.push(current_ip + 1)
+    func_called = current_quad.getResult()
+    param_count = 0
+    return globalScope.functionDirectory.getFuncQuadPosition(func_called) - 1

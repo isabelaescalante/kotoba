@@ -43,6 +43,8 @@ class WordArray :
         else :
             return False
 
+    def sortWords(self):
+        self.wordArr.sort()
 
 class Sentence :
     def __init__(self):
@@ -114,6 +116,9 @@ class Numbers :
             aux = counter
         
         return aux
+    
+    def sortNumbers(self):
+        self.numbers.sort()
 
 if __name__ == '__main__':
     funcionesWord = Word()
@@ -127,6 +132,9 @@ if __name__ == '__main__':
     print(funcionesWordList.frequency('avion'))
     print(funcionesWordList.search('avion'))
     print(funcionesWordList.exists('mundo'))
+    funcionesWordList.sortWords()
+    for word in funcionesWordList.wordArr:
+        print word
 
     funcionesSentence = Sentence()
     funcionesSentence.createSentence('The people are flying.')
@@ -139,4 +147,8 @@ if __name__ == '__main__':
     print(funcionesNum.mean())
     print(funcionesNum.median())
     print(funcionesNum.mode())
+    funcionesNum.sortNumbers()
+    for num in funcionesNum.numbers:
+        print num
+   
 
