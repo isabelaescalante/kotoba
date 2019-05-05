@@ -264,7 +264,7 @@ def p_func_constantIDArray(p) :
 			quadruple = Quad("operator_verify", "0", globalScope.functionDirectory.functions[functionName][1][p[-4]][1], p[-2])
 			globalScope.quads.append(quadruple)
 
-			quadruple = Quad("operator_add", p[-2], globalScope.functionDirectory.getVarAddress(functionName, p[-4]), address)
+			quadruple = Quad("operator_address", p[-2], globalScope.functionDirectory.getVarAddress(functionName, p[-4]), address)
 			globalScope.quads.append(quadruple)
 
 			globalScope.quadCount += 2
@@ -508,15 +508,15 @@ def p_func_logicOP(p) :
 			sys.exit("Type " + leftType + " and type " + rightType + " can't be combined with a logical operator")
 
 	elif not globalScope.pendingOperators.isEmpty() and globalScope.pendingOperators.top() == "operator_not":
-		rightOp = globalScope.pendingOperands.pop()
-		rightType = globalScope.operandTypes.pop()
+		leftOp = globalScope.pendingOperands.pop()
+		leftType = globalScope.operandTypes.pop()
 		operator = globalScope.pendingOperators.pop()
 
-		if rightType == "bool":
+		if leftType == "bool":
 			result = globalScope.functionDirectory.local_memory.get_nextAddress("bool")
 			globalScope.pendingOperands.push(result)
 			globalScope.operandTypes.push("bool")
-			quadruple = Quad(operator, "-1", rightOp, result)
+			quadruple = Quad(operator, leftOp, "-1", result)
 			globalScope.quads.append(quadruple)
 			globalScope.quadCount += 1
 		else:
@@ -621,7 +621,6 @@ def p_func_callFuncParameter(p) :
 	'func_callFuncParameter : '
 	parameterVar = globalScope.pendingOperands.pop()
 	parameterType = globalScope.operandTypes.pop()
-	parameterAddress = globalScope.functionDirectory.getVarAddress(globalScope.functionName, parameterVar)
 
 	if globalScope.isSpecial :
 		globalScope.varName = parameterVar
@@ -640,7 +639,6 @@ def p_func_endCallFunction(p) :
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 
-		print(globalScope.functionDirectory.functions[globalScope.functionCalled][0])
 		if globalScope.functionDirectory.functions[globalScope.functionCalled][0] != "void" :
 			globalScope.pendingOperands.push("(" + globalScope.functionCalled + ")")
 			globalScope.operandTypes.push(globalScope.functionDirectory.functions[globalScope.functionCalled][0])
@@ -722,38 +720,19 @@ def p_func_end(p) :
 		#quad.printQuad()
 		i += 1
 
-	print("-----------------------------")
-	globalScope.functionDirectory.global_memory.print_Memory()
-	print("-----------------------------")
-	globalScope.functionDirectory.local_memory.print_Memory()
-	print("-----------------------------")
-	globalScope.functionDirectory.constant_memory.print_Memory()
-	print("-----------------------------")
+	# print("-----------------------------")
+	# globalScope.functionDirectory.global_memory.print_Memory()
+	# print("-----------------------------")
+	# globalScope.functionDirectory.local_memory.print_Memory()
+	# print("-----------------------------")
+	# globalScope.functionDirectory.constant_memory.print_Memory()
+	# print("-----------------------------")
+	# print("-----------------------------")
+	# print("-----------------------------")
 
-yacc.yacc()
 
 # Build the parser
-data = '''kotoba program1;
-	declare number z, bool b[3.0], number x[2.0], number n;
+def parse(data) :
+	yacc.yacc()
 
-	function number myfunc(number y) {
-		declare number z;
-		set y = y + 1.0;
-		return y;
-	}
-
-	begin
-	{
-		set z = call myfunc(z);
-		call z.frequency(1.0);
-		kread(z);
-		set x = {2.0, 3.0};
-		set z = 2.0 * x[1.0];
-		set z = x[0.0] - 3.34;
-		set b = {true, false, false};
-		set n = call myfunc(z);
-	}
-	end
-'''
-
-yacc.parse(data)
+	yacc.parse(data)
