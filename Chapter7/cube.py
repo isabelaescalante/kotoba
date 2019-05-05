@@ -27,6 +27,7 @@ class Cube:
         words['operator_equal'] = 'bool'
         words['operator_notequal'] = 'bool'
 
+        sentences['operator_add'] = 'sentence'
         sentences['operator_assign'] = 'sentence'
         sentences['operator_equal'] = 'bool'
         sentences['operator_notequal'] = 'bool'
