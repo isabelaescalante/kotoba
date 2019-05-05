@@ -89,24 +89,24 @@ def execute_program():
                 instruction_pointer = new_ip
         elif operator == "operator_era":
             era_operation(current_quad)
-            instruction_pointer += 1 
+            instruction_pointer += 1
             print("Era operation completed")
         elif operator == "operator_param":
             param_operation(current_quad)
-            instruction_pointer += 1 
+            instruction_pointer += 1
             print("Param operation completed")
         elif operator == "operator_gosub":
             instruction_pointer = gosub_operation(current_quad, instruction_pointer)
             print("Gosub operation completed")
         elif operator == "operator_return":
-            instruction_pointer += 1 
+            instruction_pointer += 1
             print("Return operation completed")
         elif operator == "operator_ver":
-            instruction_pointer += 1 
+            instruction_pointer += 1
             print("Verification operation completed")
         else:
             print("Did not find operator")
-            
+
 
 # Arithmetic Operations
 def arithmetic_operation(operator, current_quad):
@@ -143,14 +143,14 @@ def arithmetic_operation(operator, current_quad):
 def assign_operation(current_quad):
     address_to_assign = current_quad.getLeftOperator()
     id_address = current_quad.getResult()
-    
+
     value_to_assign = globalScope.functionDirectory.getVarValue(address_to_assign)
 
     if value_to_assign == None:
         sys.exit("No value to assign to")
 
     globalScope.functionDirectory.setVarValue(id_address, value_to_assign)
-    
+
 # Binary relational Operations
 def bi_relational_operation(operator, current_quad):
     left_op_address = current_quad.getLeftOperator()
@@ -162,7 +162,7 @@ def bi_relational_operation(operator, current_quad):
 
     if left_value == None or right_value == None:
         sys.exit("Variable has no value to perform realtional operation")
-    
+
     if operator == "operator_greater":
         result_value = left_value > right_value
     elif operator == "operator_less":
@@ -200,7 +200,7 @@ def logical_operation(operator, current_quad):
 
     if left_value == None or right_value == None:
         sys.exit("Variable has no value to perform logical operation")
-    
+
     if operator == "operator_and":
         result_value = left_value and right_value
     elif operator == "operator_or":
@@ -250,7 +250,6 @@ def read_operation(current_quad):
         else:
             sys.exit("Wrong input for sentence")
 
-
 # Goto operations
 def goto_operation(operator, current_quad):
     goto_jump = current_quad.getResult() - 1
@@ -263,7 +262,7 @@ def goto_operation(operator, current_quad):
 
         if exp_value == None:
             sys.exit("Variable has no value to be evaluated with")
-        
+
         if not exp_value:
             return goto_jump
         else:
@@ -274,7 +273,7 @@ def goto_operation(operator, current_quad):
 
         if exp_value == None:
             sys.exit("Variable has no value to be evaluated with")
-        
+
         if exp_value:
             return goto_jump
         else:
@@ -289,7 +288,7 @@ def param_operation(current_quad):
 
     function_param_address = globalScope.functionDirectory.functions[current_function_name][2][param_count][1]
     globalScope.functionDirectory.setVarValue(function_param_address)
-    param_count += 1 
+    param_count += 1
 
 
 def gpsub_operation(current_quad, current_ip):

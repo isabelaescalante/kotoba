@@ -22,3 +22,5 @@ pendingJumps = Stack()
 operandTypes = Stack()
 instruction_pointer = 0
 arrayIndexCounter = 0
+funcSpecial = ""
+isSpecial = False
