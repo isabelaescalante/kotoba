@@ -2,6 +2,11 @@ import sys
 import globalScope
 from dataStruct import Quad
 from dataStruct import Stack
+from special import Word
+from special import WordArray
+from special import Sentence
+from special import Numbers
+from special import Array
 
 current_function_name = Stack()
 pending_return_value = Stack()
@@ -16,6 +21,8 @@ def execute_program():
         operator = current_quad.getOperator()
 
         if operator == "end":
+            print("")
+            print("PROGRAM MEMORY: ")
             print("-----------------------------")
             globalScope.functionDirectory.global_memory.print_Memory()
             print("-----------------------------")
@@ -111,9 +118,16 @@ def execute_program():
         elif operator == "operator_return":
             instruction_pointer = return_operation(current_quad) 
             #print("Return operation completed")
-        elif operator == "operator_verify" or operator == "operator_address":
+        elif operator == "operator_verify" :
+            verify_operation(current_quad, instruction_pointer)
             instruction_pointer += 1
             #print("Verification operation completed")
+        elif operator == "operator_address" :
+            address_operation(current_quad, instruction_pointer)
+            instruction_pointer += 1
+        elif operator == "operator_special":
+            special_operation(current_quad)
+            instruction_pointer += 1
         else:
             print("Did not find operator")
 
@@ -133,7 +147,11 @@ def arithmetic_operation(operator, current_quad):
         sys.exit("Variable has no value to perform arithmetic operation")
 
     if operator == "operator_add":
-        result_value = float(left_value) + float(right_value)
+        try:
+            result_value = float(left_value) + float(right_value)
+        except:
+            result_value = left_value + right_value
+            result_value = result_value.replace('""', ' ')
     elif operator == "operator_minus":
         result_value = float(left_value) - float(right_value)
     elif operator == "operator_mult":
@@ -156,13 +174,29 @@ def assign_operation(current_quad):
 
     if '(' in str(address_to_assign) : 
         value_to_assign = pending_return_value.pop()
+        if value_to_assign == None:
+            sys.exit("No value to assign to")
+
+        if len(value_to_assign) > 1 :
+            for sublist in globalScope.arrayList:
+                if(sublist[0] == id_address) :
+                    var_size = sublist[1]
+                    break
+            if var_size < len(value_to_assign) :
+                sys.exit("Variable size is smaller than result")
+            else :
+                for value in value_to_assign :
+                    globalScope.functionDirectory.setVarValue(id_address, value)
+                    id_address += 1
+        else :
+            globalScope.functionDirectory.setVarValue(id_address, value_to_assign)
+
     else : 
         value_to_assign = globalScope.functionDirectory.getVarValue(address_to_assign)
-
-    if value_to_assign == None:
-        sys.exit("No value to assign to")
-
-    globalScope.functionDirectory.setVarValue(id_address, value_to_assign)
+        if value_to_assign == None:
+            sys.exit("No value to assign to")
+        else :
+            globalScope.functionDirectory.setVarValue(id_address, value_to_assign)
 
 # Binary relational Operations
 def bi_relational_operation(operator, current_quad):
@@ -181,9 +215,15 @@ def bi_relational_operation(operator, current_quad):
     elif operator == "operator_less":
         result_value = float(left_value) < float(right_value)
     elif operator == "operator_equal":
-        result_value = float(left_value) == float(right_value)
+        try:
+            result_value = float(left_value) == float(right_value)
+        except:
+            result_value = left_value == right_value
     elif operator == "operator_notequal":
-        result_value = float(left_value) != float(right_value)
+        try:
+            result_value = float(left_value) != float(right_value)
+        except:
+            result_value = left_value != right_value
     else:
         sys.exit("Error in relational operation")
 
@@ -244,7 +284,7 @@ def print_operation(current_quad):
     if id_value == None:
         sys.exit("Variable has no value to print")
 
-    print id_value
+    print(id_value)
 
 # Read operation
 def read_operation(current_quad):
@@ -339,3 +379,293 @@ def return_operation(current_quad) :
     globalScope.functionDirectory.local_memory.clear_Memory()
 
     return new_ip
+
+def verify_operation(current_quad, instruction_pointer) :
+    left_op_address = float(current_quad.getLeftOperator())
+    right_op_address = float(current_quad.getRightOperator())
+    result_address = current_quad.getResult()
+
+
+    if float(result_address) > 999 :
+        index_value = float(globalScope.functionDirectory.getVarValue(result_address))
+        if index_value < left_op_address or index_value > right_op_address - 1 :
+            sys.exit("Index value incorrect for variable of size " + str(right_op_address))
+        else :
+            globalScope.quads[instruction_pointer].result = index_value
+            globalScope.quads[instruction_pointer + 1].leftOperator = index_value
+
+
+def address_operation(current_quad, instruction_pointer) :
+    left_op_address = current_quad.getLeftOperator()
+    right_op_address = current_quad.getRightOperator()
+    result_address = current_quad.getResult() 
+    
+    if result_address == "-1" :
+        left_value = float(left_op_address)
+        result_address = left_value + float(right_op_address)
+        globalScope.quads[instruction_pointer].result = result_address
+        if '(' in globalScope.quads[instruction_pointer + 1].leftOperator:
+            globalScope.quads[instruction_pointer+1].leftOperator = result_address
+        elif '(' in globalScope.quads[instruction_pointer + 1].rightOperator:
+            globalScope.quads[instruction_pointer+1].rightOperator = result_address
+        elif '(' in globalScope.quads[instruction_pointer + 1].result:
+            globalScope.quads[instruction_pointer+1].result = result_address
+             
+
+def special_operation(current_quad) :
+    special_function = current_quad.getResult()
+    var_used = current_quad.getLeftOperator()
+    var_value = globalScope.functionDirectory.getVarValue(var_used)
+    var_size = 0
+    list_values = []
+    if current_quad.getRightOperator() != "-1" :
+        par_used = current_quad.getRightOperator()
+        par_value = globalScope.functionDirectory.getVarValue(par_used)
+
+
+    if special_function == "length" :
+        if not ' ' in var_value and not float(var_value):
+            word = Word()
+            word.createWord(var_value)
+            result = word.length()
+            pending_return_value.push(result)
+        else :
+            sys.exit("Incorrect type of variable for function")
+        
+    elif special_function == "frequency" :
+        if not ' ' in var_value :
+            del list_values[:]
+            for sublist in globalScope.arrayList:
+                if(sublist[0] == var_used) :
+                    var_size = sublist[1]
+                    break
+            current_address = var_used
+            while current_address < var_size + var_used :
+                var_value = globalScope.functionDirectory.getVarValue(current_address)
+                list_values.append(var_value)
+                current_address += 1
+            
+            wordArray = WordArray()
+            wordArray.createArray(list_values)
+            result = wordArray.frequency(par_value)
+            pending_return_value.push(result) 
+        else :
+            sys.exit("Incorrect type of variable for function")      
+
+    elif special_function == "search" :
+        if not ' ' in var_value :
+            del list_values[:]
+            for sublist in globalScope.arrayList:
+                if(sublist[0] == var_used) :
+                    var_size = sublist[1]
+                    break
+            current_address = var_used
+            while current_address < var_size + var_used :
+                var_value = globalScope.functionDirectory.getVarValue(current_address)
+                list_values.append(var_value)
+                current_address += 1
+            
+            wordArray = WordArray()
+            wordArray.createArray(list_values)
+            result = wordArray.search(par_value) 
+            pending_return_value.push(result)  
+        else :
+            sys.exit("Incorrect type of variable for function")
+
+    elif special_function == "exists" :
+        if not ' ' in var_value :
+            del list_values[:]
+            for sublist in globalScope.arrayList:
+                if(sublist[0] == var_used) :
+                    var_size = sublist[1]
+                    break
+            current_address = var_used
+            while current_address < var_size + var_used :
+                var_value = globalScope.functionDirectory.getVarValue(current_address)
+                list_values.append(var_value)
+                current_address += 1
+            
+            wordArray = WordArray()
+            wordArray.createArray(list_values)
+            result = wordArray.exists(par_value)  
+
+            if result == True :
+                result = "true"
+            else :
+                result = "false"
+
+            pending_return_value.push(result)
+        else :
+            sys.exit("Incorrect type of variable for function")
+
+    elif special_function == "sortWords" :
+        if not ' ' in var_value :
+            del list_values[:]
+            for sublist in globalScope.arrayList:
+                if(sublist[0] == var_used) :
+                    var_size = sublist[1]
+                    break
+            current_address = var_used
+            while current_address < var_size + var_used :
+                var_value = globalScope.functionDirectory.getVarValue(current_address)
+                list_values.append(var_value)
+                current_address += 1
+            
+            wordArray = WordArray()
+            wordArray.createArray(list_values)
+            wordArray.sortWords()
+            result = wordArray.wordArr
+
+            current_address = var_used
+            while current_address < var_size + var_used :
+                for index in result :
+                    globalScope.functionDirectory.setVarValue(current_address, index)
+                    current_address += 1
+        else :
+            sys.exit("Incorrect type of variable for function")
+
+    elif special_function == "wordCount" :
+        if ' ' in var_value: 
+            sentence = Sentence()
+            sentence.createSentence(var_value)
+            result = sentence.wordCount()
+
+            pending_return_value.push(result)  
+        else :
+            sys.exit("Incorrect type of variable for function")          
+
+    elif special_function == "tokenize" :
+        if ' ' in var_value: 
+            sentence = Sentence()
+            sentence.createSentence(var_value)
+            result = sentence.tokenize()
+
+            pending_return_value.push(result)
+        else :
+            sys.exit("Incorrect type of variable for function")
+
+    elif special_function == "remove" :
+        if ' ' in var_value: 
+            sentence = Sentence()
+            sentence.createSentence(var_value)
+            sentence.remove(par_value)
+            result = sentence.sentence
+
+            globalScope.functionDirectory.setVarValue(var_used, result)
+        else :
+            sys.exit("Incorrect type of variable for function")
+    
+    elif special_function == "mean" :
+        if float(var_value) :
+            del list_values[:]
+            for sublist in globalScope.arrayList:
+                if(sublist[0] == var_used) :
+                    var_size = sublist[1]
+                    break
+            current_address = var_used
+            while current_address < var_size + var_used :
+                var_value = globalScope.functionDirectory.getVarValue(current_address)
+                list_values.append(float(var_value))
+                current_address += 1
+                
+            numArray = Numbers()
+            numArray.createArray(list_values)
+            result = numArray.mean()
+            pending_return_value.push(result)
+        else :
+            sys.exit("Incorrect type of variable for function")
+            
+    elif special_function == "median" :
+        if float(var_value) :
+            del list_values[:]
+            for sublist in globalScope.arrayList:
+                if(sublist[0] == var_used) :
+                    var_size = sublist[1]
+                    break
+            current_address = var_used
+            while current_address < var_size + var_used :
+                var_value = globalScope.functionDirectory.getVarValue(current_address)
+                list_values.append(float(var_value))
+                current_address += 1
+               
+            numArray = Numbers()
+            numArray.createArray(list_values)
+            result = numArray.median()
+            pending_return_value.push(result)
+        else :
+            sys.exit("Incorrect type of variable for function")
+
+    elif special_function == "mode" :
+        if float(var_value) :
+            del list_values[:]
+            for sublist in globalScope.arrayList:
+                if(sublist[0] == var_used) :
+                    var_size = sublist[1]
+                    break
+            current_address = var_used
+            while current_address < var_size + var_used :
+                var_value = globalScope.functionDirectory.getVarValue(current_address)
+                list_values.append(float(var_value))
+                current_address += 1
+                
+            numArray = Numbers()
+            numArray.createArray(list_values)
+            result = numArray.mode()
+            pending_return_value.push(result)
+        else :
+            sys.exit("Incorrect type of variable for function")
+
+    elif special_function == "sortNumbers" :
+        if float(var_value) :
+            del list_values[:]
+            for sublist in globalScope.arrayList:
+                if(sublist[0] == var_used) :
+                    var_size = sublist[1]
+                    break
+            current_address = var_used
+            while current_address < var_size + var_used :
+                var_value = globalScope.functionDirectory.getVarValue(current_address)
+                list_values.append(float(var_value))
+                current_address += 1
+               
+            numArray = Numbers()
+            numArray.createArray(list_values)
+            numArray.sortNumbers()
+            result = numArray.numbers
+
+            current_address = var_used
+            while current_address < var_size + var_used :
+                for index in result :
+                    globalScope.functionDirectory.setVarValue(current_address, index)
+                    current_address += 1
+        else :
+            sys.exit("Incorrect type of variable for function")
+
+    elif special_function == "size" :
+        del list_values[:]
+        for sublist in globalScope.arrayList:
+            if(sublist[0] == var_used) :
+                var_size = sublist[1]
+                break
+        if var_size < 2 :
+            sys.exit("Incorrect type of variable for function")
+
+        current_address = var_used
+        while current_address < var_size + var_used :
+            var_value = globalScope.functionDirectory.getVarValue(current_address)
+            list_values.append(var_value)
+            current_address += 1
+
+        array = Array()
+        array.createArray(list_values)
+        result = array.size()
+
+        pending_return_value.push(result)
+       
+
+    else :
+        sys.exit("La funcion " + special_function + " no existe en el lenguaje")
+
+
+
+

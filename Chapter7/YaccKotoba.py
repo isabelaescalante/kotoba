@@ -50,7 +50,7 @@ def p_declareaux(p) :
 
 def p_assign(p) :
 	'''assign : SET ID func_constantID EQUAL func_assign assignaux
-	| SET ID OPENBRAC NUMBERCTE CLOSEBRAC func_constantIDArray EQUAL func_assign assignaux'''
+	| SET ID OPENBRAC index CLOSEBRAC func_constantIDArray EQUAL func_assign assignaux'''
 
 def p_assignaux(p) :
 	'''assignaux : exp func_assign_value ENDSTMT
@@ -63,12 +63,16 @@ def p_assiaux(p) :
 
 def p_cte(p) :
 	'''cte : ID func_constantID
-	| ID OPENBRAC NUMBERCTE CLOSEBRAC func_constantIDArray
+	| ID OPENBRAC index CLOSEBRAC func_constantIDArray
 	| BOOLCTE func_boolCte func_constant
 	| NUMBERCTE func_numberCte func_constant
 	| WORDCTE func_wordCte func_constant
 	| SENTENCECTE func_sentenceCte func_constant'''
 
+def p_index(p) :
+	'''index : NUMBERCTE func_numberCte func_constant func_index
+	| ID func_constantID func_index
+ 	'''
 def p_type(p) :
 	'''type : BOOL func_type
 	| NUMBER func_type
@@ -158,7 +162,9 @@ def p_special(p) :
 	| WORDCOUNT func_special
 	| TOKENIZE func_special
 	| REMOVE func_special
-	| SORT func_special'''
+	| SORTWORDS func_special
+	| SORTNUMBERS func_special
+	| SIZE func_special'''
 
 def p_empty(p) :
 	'''empty : '''
@@ -192,6 +198,7 @@ def p_func_declare_var(p) :
 def p_func_declare_array(p) :
 	'func_declare_array : '
 	if globalScope.functionDirectory.addVariable(globalScope.functionName, p[-5], globalScope.varType, globalScope.varSize) :
+		globalScope.arrayList.append([globalScope.functionDirectory.getVarAddress(globalScope.functionName, p[-5]), globalScope.varSize, globalScope.functionName])
 		globalScope.isVarFlag = True
 	else:
 		sys.exit("Error: Variable ID already exists")
@@ -217,10 +224,19 @@ def p_func_type(p) :
 	'func_type : '
 	globalScope.varType = p[-1]
 
+def p_func_index(p) :
+	'func_index : '
+	try :
+		float(p[-3])
+		globalScope.index = p[-3]
+	except : 
+		globalScope.index = p[-2]
+
+
 # Function for constants
 def p_func_constant(p) :
 	'func_constant : '
-	if globalScope.isVarFlag:
+	if globalScope.isVarFlag :
 		if globalScope.functionDirectory.constant_memory.get_AddressForConstant(p[-2]) == -1:
 			type = globalScope.operandTypes.top()
 			address = globalScope.functionDirectory.constant_memory.get_nextAddress(type)
@@ -255,21 +271,43 @@ def p_func_constantIDArray(p) :
 	'func_constantIDArray : '
 	functionName = globalScope.functionName
 	globalScope.varName = p[-4]
+
 	if globalScope.functionDirectory.varExists(functionName, p[-4]):
-		if int(float(p[-2])) < globalScope.functionDirectory.functions[functionName][1][p[-4]][1] and int(float(p[-2])) > -1:
-			address = globalScope.functionDirectory.getVarAddress(functionName, p[-4]) + int(float(p[-2]))
-			globalScope.pendingOperands.push(address)
-			globalScope.operandTypes.push(globalScope.functionDirectory.getVarType(functionName, p[-4]))
+		index_val = globalScope.pendingOperands.pop()
+		index_type = globalScope.operandTypes.pop()
 
-			quadruple = Quad("operator_verify", "0", globalScope.functionDirectory.functions[functionName][1][p[-4]][1], p[-2])
-			globalScope.quads.append(quadruple)
+		if index_type == "number" :
+			if globalScope.functionDirectory.varExists(functionName, globalScope.index) :
+				address = "(" + str(globalScope.functionDirectory.getVarAddress(functionName, p[-4])) + ")"
+				globalScope.pendingOperands.push(address)
+				globalScope.operandTypes.push(globalScope.functionDirectory.getVarType(functionName, p[-4]))
+			
+				quadruple = Quad("operator_verify", "0", globalScope.functionDirectory.functions[functionName][1][p[-4]][1], index_val)
+				globalScope.quads.append(quadruple)
 
-			quadruple = Quad("operator_address", p[-2], globalScope.functionDirectory.getVarAddress(functionName, p[-4]), address)
-			globalScope.quads.append(quadruple)
+				quadruple = Quad("operator_address", index_val, globalScope.functionDirectory.getVarAddress(functionName, p[-4]), "-1")
+				globalScope.quads.append(quadruple)
 
-			globalScope.quadCount += 2
+				globalScope.quadCount += 2
+
+
+			elif int(float(globalScope.index)) < globalScope.functionDirectory.functions[functionName][1][p[-4]][1] and int(float(globalScope.index)) > -1:
+				address = globalScope.functionDirectory.getVarAddress(functionName, p[-4]) + int(float(globalScope.index))
+				globalScope.pendingOperands.push(address)
+				globalScope.operandTypes.push(globalScope.functionDirectory.getVarType(functionName, p[-4]))
+
+				quadruple = Quad("operator_verify", "0", globalScope.functionDirectory.functions[functionName][1][p[-4]][1], globalScope.index)
+				globalScope.quads.append(quadruple)
+
+				quadruple = Quad("operator_address", globalScope.index, globalScope.functionDirectory.getVarAddress(functionName, p[-4]), address)
+				globalScope.quads.append(quadruple)
+
+				globalScope.quadCount += 2
+
+			else :
+				sys.exit("Out of range for size of variable " + p[-4])
 		else :
-			sys.exit("Out of range for size of variable " + p[-4])
+			sys.exit("Wrong type of variable for index.")
 	else :
 		sys.exit("ID " + p[-4] + " does not exist")
 
@@ -670,6 +708,17 @@ def p_func_callSpecial(p) :
 			globalScope.quads.append(quadruple)
 			globalScope.quadCount += 1
 
+		if globalScope.funcSpecial != "sortNumbers" or globalScope.funcSpecial != "sortWords" or globalScope.funcSpecial != "remove":
+			globalScope.pendingOperands.push("(" + globalScope.funcSpecial + ")")
+			if globalScope.funcSpecial == "exists" :
+				globalScope.operandTypes.push("bool")
+			elif globalScope.funcSpecial == "tokenize" :
+				globalScope.operandTypes.push("word")
+			else :
+				globalScope.operandTypes.push("number")
+
+		
+
 	globalScope.isSpecial = False
 
 def p_func_return(p) :
@@ -726,9 +775,10 @@ def p_func_end(p) :
 	# globalScope.functionDirectory.local_memory.print_Memory()
 	# print("-----------------------------")
 	# globalScope.functionDirectory.constant_memory.print_Memory()
-	# print("-----------------------------")
-	# print("-----------------------------")
-	# print("-----------------------------")
+	print("-----------------------------")
+	print("-----------------------------")
+	print("-----------------------------")
+	print("")
 
 
 # Build the parser

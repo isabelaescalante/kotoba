@@ -1,6 +1,6 @@
 import ply.lex as lex
 
-tokens = ['KOTOBA', 'BEGIN', 'END', 'READ', 'WRITE', 'DEC', 'BOOL', 'NUMBER', 'WORD', 'SENTENCE', 'IF', 'ELSE', 'DO', 'WHILE', 'FUNC', 'RETURN', 'VOID', 'LENGTH', 'FREQUENCY', 'SEARCH', 'EXISTS', 'MEAN', 'MEDIAN', 'MODE', 'WORDCOUNT', 'TOKENIZE', 'REMOVE', 'AND', 'OR', 'ID', 'BOOLCTE', 'NUMBERCTE', 'WORDCTE', 'SENTENCECTE', 'RELOP', 'PLUS', 'MINUS', 'MULT', 'DIV', 'NOT', 'ENDSTMT', 'COMA', 'DOT', 'OPENCURL', 'CLOSECURL', 'OPENPAREN', 'CLOSEPAREN', 'OPENBRAC', 'CLOSEBRAC', 'EQUAL', 'CALL', 'SET', 'SORT']
+tokens = ['KOTOBA', 'BEGIN', 'END', 'READ', 'WRITE', 'DEC', 'BOOL', 'NUMBER', 'WORD', 'SENTENCE', 'IF', 'ELSE', 'DO', 'WHILE', 'FUNC', 'RETURN', 'VOID', 'LENGTH', 'FREQUENCY', 'SEARCH', 'EXISTS', 'MEAN', 'MEDIAN', 'MODE', 'WORDCOUNT', 'TOKENIZE', 'REMOVE', 'AND', 'OR', 'ID', 'BOOLCTE', 'NUMBERCTE', 'WORDCTE', 'SENTENCECTE', 'RELOP', 'PLUS', 'MINUS', 'MULT', 'DIV', 'NOT', 'ENDSTMT', 'COMA', 'DOT', 'OPENCURL', 'CLOSECURL', 'OPENPAREN', 'CLOSEPAREN', 'OPENBRAC', 'CLOSEBRAC', 'EQUAL', 'CALL', 'SET', 'SORTWORDS', 'SORTNUMBERS', 'SIZE']
 
 reserved = {
     'kotoba' : 'KOTOBA',
@@ -32,7 +32,9 @@ reserved = {
     'remove' : 'REMOVE',
     'call' : 'CALL',
     'set' : 'SET',
-    'sort' : 'SORT'
+    'sortWords' : 'SORTWORDS',
+    'sortNumbers' : 'SORTNUMBERS',
+    'size' : 'SIZE'
 }
 
 t_ignore = ' \t\n'
@@ -65,7 +67,9 @@ t_TOKENIZE = r'"tokenize"'
 t_REMOVE = r'"remove"'
 t_CALL = r'"call"'
 t_SET = r'"set'
-t_SORT = r'"sort"'
+t_SORTWORDS = r'"sortWords"'
+t_SORTNUMBERS = r'"sortNumbers"'
+t_SIZE = r'"size"'
 t_AND = r'\&'
 t_OR = r'\|'
 t_NUMBERCTE = r'[\+|\-]?[0-9]+(\.[0-9]+)'
