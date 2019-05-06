@@ -2,8 +2,16 @@ import YaccKotoba
 import virtualMachine
 
 def parseCode(data) :
+
     YaccKotoba.parse(data)
     virtualMachine.execute_program()
+
+def getFinalVariables() :
+    return virtualMachine.finalVariables()
+
+def getOutput() :
+    return virtualMachine.printValues
+    
 
 
 if __name__ == '__main__':
@@ -26,7 +34,7 @@ if __name__ == '__main__':
                 set n = n + 1.0;
             }
 
-            set s = w[0.0] + w[1.0];
+            set s=w[0.0]+w[1.0];
 
             kprint(s);
 
@@ -35,3 +43,6 @@ if __name__ == '__main__':
         end
     '''
     parseCode(data)
+    print(getFinalVariables())
+    print("")
+    print(getOutput())
