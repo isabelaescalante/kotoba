@@ -176,7 +176,7 @@ def p_func_start(p) :
 	if globalScope.functionDirectory.addFunction("Main", "void", -1) :
 		globalScope.functionName = "Main"
 	else :
-		sys.exit("Error: Function ID already exists")
+		sys.exit("Error: Function ID Main already exists")
 
 # Function to toggle constant flag (size/constant)
 def p_func_isSize(p) :
@@ -194,7 +194,7 @@ def p_func_declare_array(p) :
 	if globalScope.functionDirectory.addVariable(globalScope.functionName, p[-5], globalScope.varType, globalScope.varSize) :
 		globalScope.isVarFlag = True
 	else:
-		sys.exit("Error: Variable ID already exists")
+		sys.exit("Error: Variable ID " + p[-5] + "already exists")
 
 def p_func_declare_par(p) :
 	'func_declare_par : '
@@ -615,7 +615,7 @@ def p_func_callFunc(p) :
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 	else :
-		sys.exit("Function ID doesn't exist in directory")
+		sys.exit("Function ID " + p[-1] + " doesn't exist in directory")
 
 def p_func_callFuncParameter(p) :
 	'func_callFuncParameter : '
@@ -643,9 +643,9 @@ def p_func_endCallFunction(p) :
 			globalScope.pendingOperands.push("(" + globalScope.functionCalled + ")")
 			globalScope.operandTypes.push(globalScope.functionDirectory.functions[globalScope.functionCalled][0])
 
-		print("Local Memory for: " + globalScope.functionCalled)
-		globalScope.functionDirectory.local_memory.print_Memory()
-		print("-----------------------------")
+		# print("Local Memory for: " + globalScope.functionCalled)
+		# globalScope.functionDirectory.local_memory.print_Memory()
+		# print("-----------------------------")
 		globalScope.functionCalled = ""
 		globalScope.parameterCount = 1
 
@@ -710,8 +710,8 @@ def p_func_end(p) :
 	globalScope.quadCount += 1
 
 	print("Compilation succeeded")
-	globalScope.functionDirectory.printDirectory()
-	print("-----------------------------")
+	#globalScope.functionDirectory.printDirectory()
+	#print("-----------------------------")
 
 	print("My quads are: ")
 	i = 1
@@ -719,8 +719,8 @@ def p_func_end(p) :
 		print(str(i) + "   " + str(quad.getOperator()) + "\t" + str(quad.getLeftOperator()) + "\t" + str(quad.getRightOperator()) + "\t" + str(quad.getResult()))
 		#quad.printQuad()
 		i += 1
-
-	# print("-----------------------------")
+	print("-----------------------------")
+	
 	# globalScope.functionDirectory.global_memory.print_Memory()
 	# print("-----------------------------")
 	# globalScope.functionDirectory.local_memory.print_Memory()
