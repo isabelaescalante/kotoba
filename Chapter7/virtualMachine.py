@@ -16,6 +16,7 @@ current_function_name = Stack()
 pending_return_value = Stack()
 return_ip = Stack()
 param_count = 0
+printValues = []
 
 def execute_program():
     instruction_pointer = globalScope.instruction_pointer
@@ -27,6 +28,7 @@ def execute_program():
         if operator == "end":
             print("")
             print("-----------------------------")
+
             # print("-----------------------------")
             # print("-----------------------------")            
             # print("-----------------------------")
@@ -37,6 +39,7 @@ def execute_program():
             # globalScope.functionDirectory.constant_memory.print_Memory()
             # print("-----------------------------")
             sys.exit("Execution Successful")
+
         elif operator == "operator_add":
             arithmetic_operation("operator_add", current_quad)
             instruction_pointer += 1
@@ -291,6 +294,7 @@ def print_operation(current_quad):
     if id_value == None:
         sys.exit("Variable has no value to print")
 
+    printValues.append(id_value)
     print(id_value)
 
 # Read operation
@@ -450,21 +454,7 @@ def address_operation(current_quad, instruction_pointer) :
         result_val = left_value + float(right_op_address)
         result_pointer = globalScope.functionDirectory.getVarValue(result_val)
         globalScope.functionDirectory.constant_memory.set_AddressValue(result_address, result_pointer)
-
-        # base_address ='(' + str(globalScope.quads[instruction_pointer].rightOperator) + ')'
-
-        # i = 0
-        # for quad in globalScope.quads:
-        #     if i > instruction_pointer :
-        #         if base_address in str(globalScope.quads[i].leftOperator):
-        #             globalScope.quads[i].leftOperator = result_address
-        #         elif base_address in str(globalScope.quads[i].rightOperator):
-        #             globalScope.quads[i].rightOperator = result_address
-        #         elif base_address in str(globalScope.quads[i].result):
-        #             globalScope.quads[i].result = result_address
-        #     i += 1
             
-             
 
 def special_operation(current_quad) :
     special_function = current_quad.getResult()
@@ -720,6 +710,24 @@ def special_operation(current_quad) :
     else :
         sys.exit("Function " + special_function + " does not exist in language")
 
+def finalVariables() :
+    variables = []
 
+    for varName in globalScope.functionDirectory.functions["Main"][1] :
+        size = globalScope.functionDirectory.functions["Main"][1][varName][1]
+        if size == 1 :
+            data = globalScope.functionDirectory.functions["Main"][1][varName]
+            value = globalScope.functionDirectory.getVarValue(data[2])
+        else :
+            i = 0
+            values = []
+            while i < size :
+                data = globalScope.functionDirectory.functions["Main"][1][varName]
+                values.append(globalScope.functionDirectory.getVarValue(data[2] + i))
+                i += 1
+            value = values
+        if not value is None:
+            variables.append([varName, value])
 
+    return variables
 

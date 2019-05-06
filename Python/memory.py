@@ -50,7 +50,7 @@ class Memory:
                 return address
             
             else:
-                print("Memory is full")
+                sys.exit("Memory is full")
 
 
     def set_AddressValue(self, address, varValue):
@@ -161,7 +161,7 @@ class Memory:
         print("Bool: ")
         for key, value in self.bool_memory.iteritems():
             print(key, value)
-  
+
 
 # #TEST
 # mem = Memory("Global", 1000, 1999)

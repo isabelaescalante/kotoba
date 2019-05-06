@@ -1,17 +1,90 @@
 body{
-    font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
-td{
-    padding: 10px;
+h1{
+    padding: 0;
+    text-align: center;
+    font-size: 300%;
 }
 
 #left{
     float: left;
     width: 50%;
+    margin-left: 1%;
 }
 
 #right{
     float: right;
-    width: 50%;
+    margin: 0;
+    margin-left: 2%;
+    width: 40%;
+}
+
+button {
+  background-color: #008CBA;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  padding: 10px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 15px;
+  float: right;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+
+button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+button span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+button:hover span {
+  padding-right: 20px;
+}
+
+button:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+
+#code {
+  font-size: 100%;
+}
+
+.io {
+  margin-top: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#input {
+  float: left;
+  margin: 0 5px;
+  margin-left: 8%;
+}
+
+#output {
+  float:left;
+  margin: 0 10px;
+  margin-right: 10%;
+}
+
+
+#graphs {
 }
