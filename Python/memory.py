@@ -161,9 +161,6 @@ class Memory:
         print("Bool: ")
         for key, value in self.bool_memory.iteritems():
             print(key, value)
-
-    def getFinalNumbers(self) :
-        return self.number_memory.iteritems()
   
 
 # #TEST
