@@ -81,7 +81,6 @@ class Directory:
 
     def getVarType(self, functionName, varName):
         return self.functions[functionName][1][varName][0]
-        
     
     def getVarAddress(self, functionName, varName):
         return self.functions[functionName][1][varName][2]

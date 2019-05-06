@@ -5,7 +5,7 @@ class Word :
         self.word = ''
 
     def createWord(self, wordGiven) :
-        self.word = wordGiven
+        self.word = wordGiven.replace('"', '')
 
     def length(self) :
         return len(self.word)
@@ -27,15 +27,14 @@ class WordArray :
         return counter
 
     def search(self, word):
-        results = [] 
         index = 0
 
         for i in self.wordArr :
             if word == i :
-                results.append(index)
+                return index
             index += 1
 
-        return results
+        return -1
 
     def exists(self, word):
         if word in self.wordArr:
@@ -51,7 +50,7 @@ class Sentence :
         self.sentence = ''
 
     def createSentence(self, stringSentence) :
-        self.sentence = stringSentence
+        self.sentence = stringSentence.replace('"', '')
 
     def wordCount(self):
         return len(re.findall(r'\w+', self.sentence)) 
@@ -62,16 +61,15 @@ class Sentence :
         else :
             listWords = []
             for i in self.sentence.split() :
-                listWords.append(i)
+                listWords.append('"'+ i + '"')
 
             return listWords
 
     def remove(self, word):
+        word = word.replace('"', '')
         aux = self.sentence.replace(word, '')
         aux = re.sub(' +', ' ', aux)
         self.sentence = re.sub('^ +', '', aux)
-
-        return self.sentence
 
 class Numbers :
     def __init__(self):
@@ -98,27 +96,42 @@ class Numbers :
             return median / 2.0
 
     def mode(self):
-        self.numbers.sort()
-        counter = 1
-        aux = -1
-        index = 1
-        while index < len(self.numbers) :
-            if self.numbers[index] != self.numbers[index - 1] :
-                if counter > aux :
-                    aux = counter
-                    counter = 0
-                else :
-                    counter += 1
+        result = max(self.numbers, key = self.numbers.count)
+        # counter = 1
+        # aux = -1
+        # index = 1
+        # result = None
 
-            index += 1
+        # print(self.numbers)
+        # while index < len(self.numbers) :
+        #     if self.numbers[index] != self.numbers[index - 1] :
+        #         if counter > aux :
+        #             aux = counter
+        #             counter = 0
+        #             result = self.numbers[index]
+        #         else :
+        #             counter += 1
 
-        if counter > aux :
-            aux = counter
+        #     index += 1
+
+        # if counter > aux :
+        #     aux = counter
         
-        return aux
+        return result
     
     def sortNumbers(self):
         self.numbers.sort()
+
+class Array :
+    def __init__(self):
+        self.lst = []
+
+    def createArray(self, array) :
+        self.lst = array
+
+    
+    def size(self) :
+        return float(len(self.lst))
 
 if __name__ == '__main__':
     funcionesWord = Word()

@@ -3,40 +3,25 @@ import virtualMachine
 
 if __name__ == '__main__':
     data = '''kotoba program1;
-      
-           declare number x;
+        declare word w[4.0], number n, sentence s, number arr[5.0];
 
-           function void fib(number n) {
-                declare number a, number b, number aux, number i;
+        begin
+        {
+            set s = "The dog is running.";
+            set arr = {2.0, 34.5, 67.56, 4.1, 0.12};
 
-                set a = 0.0;
-                set b = 1.0;
-                set i = 2.0;
-                kprint(a);
-                kprint(b);
+            set w = call s.tokenize();
 
-                while(i < (n + 1.0)) {
-                    set aux = a + b;
-                    set a = b;
-                    set b = aux;
-                    set i = i + 1.0;
-                    kprint(aux);
-                }
-                
-               
-                return "void";
-       }
+            set s = w[0.0] + w[1.0];
 
+            set n = 2.0;
 
-           begin
-           {
-               set x = 7.0;
-               call fib(x);
-           }
-           end
-   '''
-
-
+            kprint(w[n]);
+            kprint(arr[3.0]);
+            kprint(s);
+        }
+        end
+    '''
 
     YaccKotoba.parse(data)
 
