@@ -26,20 +26,15 @@ def execute_program():
 
         if operator == "end":
             print("")
-            print("PROGRAM MEMORY: ")
+            print("-----------------------------")
+            print("-----------------------------")
+            print("-----------------------------")            
             print("-----------------------------")
             globalScope.functionDirectory.global_memory.print_Memory()
             print("-----------------------------")
             globalScope.functionDirectory.local_memory.print_Memory()
             print("-----------------------------")
             globalScope.functionDirectory.constant_memory.print_Memory()
-            print("-----------------------------")
-            print("-----------------------------")
-            print("My quads are: ")
-            i = 1
-            for quad in globalScope.quads:
-                print(str(i) + "   " + str(quad.getOperator()) + "\t" + str(quad.getLeftOperator()) + "\t" + str(quad.getRightOperator()) + "\t" + str(quad.getResult()))
-                i += 1
             print("-----------------------------")
             sys.exit("Execution Successful")
         elif operator == "operator_add":
@@ -420,7 +415,7 @@ def return_operation(current_quad) :
     # finished_era.era_memory.print_Memory()
     # print("-----------------------------")
     
-    next_era = local_memory_handler.top()
+    next_era = local_memory_handler.pop()
     
     # print("NEXT ERA:")
     # next_era.era_memory.print_Memory()
