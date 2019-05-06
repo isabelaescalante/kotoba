@@ -84,7 +84,8 @@ def p_statement(p) :
 	| expression
 	| condition
 	| cycle
-	| callfunction'''
+	| callfunction
+	| returnaux'''
 
 def p_expression(p) :
 	'''expression : logexpression
@@ -122,8 +123,8 @@ def p_cycle(p) :
 	| DO func_do block WHILE OPENPAREN expression CLOSEPAREN func_endDoWhile ENDSTMT'''
 
 def p_function(p) :
-	'''function : FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux returnaux ENDSTMT CLOSECURL
-	| FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux returnaux ENDSTMT CLOSECURL'''
+	'''function : FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL declare blockaux CLOSECURL
+	| FUNC funcaux ID func_declare_function OPENPAREN parameter CLOSEPAREN OPENCURL blockaux CLOSECURL'''
 
 def p_funcaux(p) :
 	'''funcaux : type
@@ -139,8 +140,7 @@ def p_parameteraux(p) :
 	| empty'''
 
 def p_returnaux(p) :
-	'''returnaux : RETURN ID func_return
-	| RETURN func_return'''
+	'''returnaux : RETURN expression func_return ENDSTMT'''
 
 def p_callfunction(p) :
 	'''callfunction : CALL ID DOT special OPENPAREN spaux CLOSEPAREN func_callSpecial ENDSTMT
@@ -182,7 +182,7 @@ def p_func_start(p) :
 	if globalScope.functionDirectory.addFunction("Main", "void", -1) :
 		globalScope.functionName = "Main"
 	else :
-		sys.exit("Error: Function ID already exists")
+		sys.exit("Error: Function ID Main already exists")
 
 # Function to toggle constant flag (size/constant)
 def p_func_isSize(p) :
@@ -201,7 +201,7 @@ def p_func_declare_array(p) :
 		globalScope.arrayList.append([globalScope.functionDirectory.getVarAddress(globalScope.functionName, p[-5]), globalScope.varSize, globalScope.functionName])
 		globalScope.isVarFlag = True
 	else:
-		sys.exit("Error: Variable ID already exists")
+		sys.exit("Error: Variable ID " + p[-5] + "already exists")
 
 def p_func_declare_par(p) :
 	'func_declare_par : '
@@ -653,7 +653,7 @@ def p_func_callFunc(p) :
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
 	else :
-		sys.exit("Function ID doesn't exist in directory")
+		sys.exit("Function ID " + p[-1] + " doesn't exist in directory")
 
 def p_func_callFuncParameter(p) :
 	'func_callFuncParameter : '
@@ -681,9 +681,9 @@ def p_func_endCallFunction(p) :
 			globalScope.pendingOperands.push("(" + globalScope.functionCalled + ")")
 			globalScope.operandTypes.push(globalScope.functionDirectory.functions[globalScope.functionCalled][0])
 
-		print("Local Memory for: " + globalScope.functionCalled)
-		globalScope.functionDirectory.local_memory.print_Memory()
-		print("-----------------------------")
+		# print("Local Memory for: " + globalScope.functionCalled)
+		# globalScope.functionDirectory.local_memory.print_Memory()
+		# print("-----------------------------")
 		globalScope.functionCalled = ""
 		globalScope.parameterCount = 1
 
@@ -724,7 +724,7 @@ def p_func_callSpecial(p) :
 def p_func_return(p) :
 	'func_return : '
 	if globalScope.functionDirectory.functionType(globalScope.functionName) != "void":
-		address = globalScope.functionDirectory.getVarAddress(globalScope.functionName, p[-1])
+		address = globalScope.pendingOperands.pop()
 		quadruple = Quad("operator_return", "-1", "-1", address)
 		globalScope.quads.append(quadruple)
 		globalScope.quadCount += 1
@@ -759,8 +759,8 @@ def p_func_end(p) :
 	globalScope.quadCount += 1
 
 	print("Compilation succeeded")
-	globalScope.functionDirectory.printDirectory()
-	print("-----------------------------")
+	#globalScope.functionDirectory.printDirectory()
+	#print("-----------------------------")
 
 	print("My quads are: ")
 	i = 1
@@ -768,8 +768,8 @@ def p_func_end(p) :
 		print(str(i) + "   " + str(quad.getOperator()) + "\t" + str(quad.getLeftOperator()) + "\t" + str(quad.getRightOperator()) + "\t" + str(quad.getResult()))
 		#quad.printQuad()
 		i += 1
-
-	# print("-----------------------------")
+	print("-----------------------------")
+	
 	# globalScope.functionDirectory.global_memory.print_Memory()
 	# print("-----------------------------")
 	# globalScope.functionDirectory.local_memory.print_Memory()

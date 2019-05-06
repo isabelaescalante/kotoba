@@ -7,7 +7,11 @@ from special import WordArray
 from special import Sentence
 from special import Numbers
 from special import Array
+from dataStruct import ActivationRecord
+from memory import Memory
 
+
+local_memory_handler = Stack()
 current_function_name = Stack()
 pending_return_value = Stack()
 return_ip = Stack()
@@ -15,7 +19,7 @@ param_count = 0
 
 def execute_program():
     instruction_pointer = globalScope.instruction_pointer
-
+    
     while True:
         current_quad = globalScope.quads[instruction_pointer]
         operator = current_quad.getOperator()
@@ -152,6 +156,7 @@ def arithmetic_operation(operator, current_quad):
         except:
             result_value = left_value + right_value
             result_value = result_value.replace('""', ' ')
+
     elif operator == "operator_minus":
         result_value = float(left_value) - float(right_value)
     elif operator == "operator_mult":
@@ -350,6 +355,19 @@ def goto_operation(operator, current_quad):
 
 def era_operation(current_quad):
     current_function_name.push(current_quad.getResult())
+    current_era = ActivationRecord(globalScope.functionDirectory.local_memory)
+    local_memory_handler.push(current_era)
+
+    # globalScope.functionDirectory.local_memory.clear_Memory()
+
+    new_memory = Memory("Local/Temporal", 2000, 3999)
+    new_era = ActivationRecord(new_memory)
+    local_memory_handler.push(new_era)
+    
+    # print("PREVIOUS ERA:")
+    # current_era.era_memory.print_Memory()
+    # print("-----------------------------")
+    
 
 def param_operation(current_quad):
     global param_count
@@ -357,26 +375,52 @@ def param_operation(current_quad):
     param_value = globalScope.functionDirectory.getVarValue(param_address)
 
     function_param_address = globalScope.functionDirectory.functions[current_function_name.top()][2][param_count][1]
-    globalScope.functionDirectory.setVarValue(function_param_address, param_value)
-    param_count += 1
+    
+    func_era = local_memory_handler.top()
+    func_era.era_memory.set_AddressValue(function_param_address, param_value)
 
+    # globalScope.functionDirectory.setVarValue(function_param_address, param_value)
+    param_count += 1
 
 def gosub_operation(current_quad, current_ip):
     global param_count
     return_ip.push(current_ip + 1)
     func_called = current_quad.getResult()
     param_count = 0
+
+    new_era = local_memory_handler.top()
+    globalScope.functionDirectory.local_memory = new_era.era_memory
+    
+    # print("ERA GOSUB")
+    # new_era.era_memory.print_Memory()
+    # print("-----------------------------")
+    
     return globalScope.functionDirectory.getFuncQuadPosition(func_called) - 1
 
 def return_operation(current_quad) :
     current_function_name.pop()
-
+    
     return_value = globalScope.functionDirectory.getVarValue(current_quad.getResult())
-
     pending_return_value.push(return_value)
+   
+    # print("Return Value: " + str(return_value))
+   
     new_ip = return_ip.pop()
-
-    globalScope.functionDirectory.local_memory.clear_Memory()
+    
+    finished_era = local_memory_handler.pop()
+    
+    # print("ERA DONE:")
+    # finished_era.era_memory.print_Memory()
+    # print("-----------------------------")
+    
+    next_era = local_memory_handler.top()
+    
+    # print("NEXT ERA:")
+    # next_era.era_memory.print_Memory()
+    # print("-----------------------------")
+    
+    globalScope.functionDirectory.local_memory = next_era.era_memory
+    # globalScope.functionDirectory.local_memory.clear_Memory()
 
     return new_ip
 
