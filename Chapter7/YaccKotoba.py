@@ -779,9 +779,9 @@ def p_func_end(p) :
 	# globalScope.functionDirectory.local_memory.print_Memory()
 	# print("-----------------------------")
 	# globalScope.functionDirectory.constant_memory.print_Memory()
-	print("-----------------------------")
-	print("-----------------------------")
-	print("-----------------------------")
+	# print("-----------------------------")
+	# print("-----------------------------")
+	# print("-----------------------------")
 	print("")
 
 
