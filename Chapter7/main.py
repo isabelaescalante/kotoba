@@ -8,7 +8,7 @@ def parseCode(data) :
 
 if __name__ == '__main__':
     data = '''kotoba program1;
-        declare word w[4.0], number n, sentence s, number arr[5.0];
+        declare word w[4.0], number n, sentence s, number arr[5.0], number len;
 
         begin
         {
@@ -19,11 +19,18 @@ if __name__ == '__main__':
 
             set n = 0.0;
 
-            set s = w[n] + w[1.0];
+            set len = call w.size();
 
-            kprint(w[n]);
-            kprint(arr[3.0]);
+            while(n < len) {
+                kprint(w[n]);
+                set n = n + 1.0;
+            }
+
+            set s = w[0.0] + w[1.0];
+
             kprint(s);
+
+            set n = 0.0;
         }
         end
     '''

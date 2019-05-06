@@ -39,7 +39,6 @@ def execute_program():
             i = 1
             for quad in globalScope.quads:
                 print(str(i) + "   " + str(quad.getOperator()) + "\t" + str(quad.getLeftOperator()) + "\t" + str(quad.getRightOperator()) + "\t" + str(quad.getResult()))
-                #quad.printQuad()
                 i += 1
             print("-----------------------------")
             sys.exit("Execution Successful")
@@ -185,10 +184,12 @@ def assign_operation(current_quad):
 
     if '(' in str(address_to_assign) : 
         value_to_assign = pending_return_value.pop()
+
         if value_to_assign == None:
             sys.exit("No value to assign to")
 
-        if len(value_to_assign) > 1 :
+        try: 
+            len(value_to_assign) > 1
             for sublist in globalScope.arrayList:
                 if(sublist[0] == id_address) :
                     var_size = sublist[1]
@@ -199,7 +200,7 @@ def assign_operation(current_quad):
                 for value in value_to_assign :
                     globalScope.functionDirectory.setVarValue(id_address, value)
                     id_address += 1
-        else :
+        except :
             globalScope.functionDirectory.setVarValue(id_address, value_to_assign)
 
     else : 
@@ -441,8 +442,7 @@ def verify_operation(current_quad, instruction_pointer) :
         if index_value < left_op_address or index_value > right_op_address - 1 :
             sys.exit("Index value incorrect for variable of size " + str(right_op_address))
         else :
-            globalScope.quads[instruction_pointer].result = index_value
-            globalScope.quads[instruction_pointer + 1].leftOperator = index_value
+            globalScope.functionDirectory.setVarValue(globalScope.quads[instruction_pointer].result, index_value)
 
 
 def address_operation(current_quad, instruction_pointer) :
@@ -450,23 +450,24 @@ def address_operation(current_quad, instruction_pointer) :
     right_op_address = current_quad.getRightOperator()
     result_address = current_quad.getResult() 
     
-    if result_address == "-1" :
-        left_value = float(left_op_address)
-        result_address = left_value + float(right_op_address)
-        globalScope.quads[instruction_pointer].result = result_address
+    if float(left_op_address) > 999 :
+        left_value = float(globalScope.functionDirectory.getVarValue(left_op_address))
+        result_val = left_value + float(right_op_address)
+        result_pointer = globalScope.functionDirectory.getVarValue(result_val)
+        globalScope.functionDirectory.constant_memory.set_AddressValue(result_address, result_pointer)
 
-        base_address ='(' + str(globalScope.quads[instruction_pointer].rightOperator) + ')'
+        # base_address ='(' + str(globalScope.quads[instruction_pointer].rightOperator) + ')'
 
-        i = 0
-        for quad in globalScope.quads:
-            if i > instruction_pointer :
-                if base_address in str(globalScope.quads[i].leftOperator):
-                    globalScope.quads[i].leftOperator = result_address
-                elif base_address in str(globalScope.quads[i].rightOperator):
-                    globalScope.quads[i].rightOperator = result_address
-                elif base_address in str(globalScope.quads[i].result):
-                    globalScope.quads[i].result = result_address
-            i += 1
+        # i = 0
+        # for quad in globalScope.quads:
+        #     if i > instruction_pointer :
+        #         if base_address in str(globalScope.quads[i].leftOperator):
+        #             globalScope.quads[i].leftOperator = result_address
+        #         elif base_address in str(globalScope.quads[i].rightOperator):
+        #             globalScope.quads[i].rightOperator = result_address
+        #         elif base_address in str(globalScope.quads[i].result):
+        #             globalScope.quads[i].result = result_address
+        #     i += 1
             
              
 
@@ -722,7 +723,7 @@ def special_operation(current_quad) :
        
 
     else :
-        sys.exit("La funcion " + special_function + " no existe en el lenguaje")
+        sys.exit("Function " + special_function + " does not exist in language")
 
 
 
