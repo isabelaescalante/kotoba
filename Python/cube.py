@@ -17,15 +17,20 @@ class Cube:
         numbers['operator_minus'] = 'number'
         numbers['operator_mult'] = 'number'
         numbers['operator_div'] = 'number'
-        numbers['operator_greater'] = 'number'
-        numbers['operator_less'] = 'number'
-        numbers['operator_equal'] = 'number'
-        numbers['operator_notequal'] = 'number'
+        numbers['operator_greater'] = 'bool'
+        numbers['operator_less'] = 'bool'
+        numbers['operator_equal'] = 'bool'
+        numbers['operator_notequal'] = 'bool'
 
         words['operator_assign'] = 'word'
         words['operator_add'] = 'sentence'
+        words['operator_equal'] = 'bool'
+        words['operator_notequal'] = 'bool'
 
+        sentences['operator_add'] = 'sentence'
         sentences['operator_assign'] = 'sentence'
+        sentences['operator_equal'] = 'bool'
+        sentences['operator_notequal'] = 'bool'
 
         self.cube['bool'] = bools
         self.cube['number'] = numbers
@@ -38,20 +43,18 @@ class Cube:
         if data_type1 in types:
             if data_type1 == data_type2:
                 if operator in self.cube[data_type1]:
-                    return True
+                    return self.cube[data_type1][operator]
                 else:
-                    return False
+                    return None
             elif 'operator_not' in self.cube[data_type1]:
-                return True
+                return self.cube[data_type1][operator]
             else:
-                return False
+                return None
         else:
-            return False
+            return None
 
 if __name__ == '__main__':
     semantic = Cube()
 
-    if semantic.verification('operator_not','bool', None):
-        print("Correct")
-    else:
-        print("Incorrect")
+    print(semantic.verification('operator_add','word', 'number'))
+   

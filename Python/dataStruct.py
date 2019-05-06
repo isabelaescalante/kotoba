@@ -2,6 +2,7 @@
 # March 15, 2019
 
 from collections import deque
+from memory import Memory
 
 #Quadruple
 class Quad:
@@ -22,6 +23,9 @@ class Quad:
 
     def getResult(self):
         return self.result
+
+    def setResult(self, res):
+        self.result = res
 
     def printQuad(self):
         print('{}, {}, {}, {}'.format(self.operator, self.leftOperator, self.rightOperator, self.result))
@@ -88,6 +92,12 @@ class Queue:
     #Returns and removes first element in the queue
     def pop(self):
         return self.items.popleft()
+
+# Activation Record
+class ActivationRecord:
+    def __init__(self, func_memory):
+        self.era_memory = func_memory #local memory for current function, type: Memory
+
 
 
 

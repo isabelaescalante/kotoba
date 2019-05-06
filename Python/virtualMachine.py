@@ -35,12 +35,6 @@ def execute_program():
             globalScope.functionDirectory.constant_memory.print_Memory()
             print("-----------------------------")
             print("-----------------------------")
-            print("My quads are: ")
-            i = 1
-            for quad in globalScope.quads:
-                print(str(i) + "   " + str(quad.getOperator()) + "\t" + str(quad.getLeftOperator()) + "\t" + str(quad.getRightOperator()) + "\t" + str(quad.getResult()))
-                #quad.printQuad()
-                i += 1
             print("-----------------------------")
             sys.exit("Execution Successful")
         elif operator == "operator_add":
@@ -454,20 +448,12 @@ def address_operation(current_quad, instruction_pointer) :
         left_value = float(left_op_address)
         result_address = left_value + float(right_op_address)
         globalScope.quads[instruction_pointer].result = result_address
-
-        base_address ='(' + str(globalScope.quads[instruction_pointer].rightOperator) + ')'
-
-        i = 0
-        for quad in globalScope.quads:
-            if i > instruction_pointer :
-                if base_address in str(globalScope.quads[i].leftOperator):
-                    globalScope.quads[i].leftOperator = result_address
-                elif base_address in str(globalScope.quads[i].rightOperator):
-                    globalScope.quads[i].rightOperator = result_address
-                elif base_address in str(globalScope.quads[i].result):
-                    globalScope.quads[i].result = result_address
-            i += 1
-            
+        if '(' in globalScope.quads[instruction_pointer + 1].leftOperator:
+            globalScope.quads[instruction_pointer+1].leftOperator = result_address
+        elif '(' in globalScope.quads[instruction_pointer + 1].rightOperator:
+            globalScope.quads[instruction_pointer+1].rightOperator = result_address
+        elif '(' in globalScope.quads[instruction_pointer + 1].result:
+            globalScope.quads[instruction_pointer+1].result = result_address
              
 
 def special_operation(current_quad) :
