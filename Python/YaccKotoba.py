@@ -278,14 +278,18 @@ def p_func_constantIDArray(p) :
 
 		if index_type == "number" :
 			if globalScope.functionDirectory.varExists(functionName, globalScope.index) :
-				address = "(" + str(globalScope.functionDirectory.getVarAddress(functionName, p[-4])) + ")"
+				#crea una direccion temporal para el result del quad de address
+				address = globalScope.functionDirectory.constant_memory.get_nextAddress("number")
+				globalScope.functionDirectory.constant_memory.set_AddressValue(address, p[-2])
+				
+				#pushea esa en el stack
 				globalScope.pendingOperands.push(address)
 				globalScope.operandTypes.push(globalScope.functionDirectory.getVarType(functionName, p[-4]))
 			
 				quadruple = Quad("operator_verify", "0", globalScope.functionDirectory.functions[functionName][1][p[-4]][1], index_val)
 				globalScope.quads.append(quadruple)
 
-				quadruple = Quad("operator_address", index_val, globalScope.functionDirectory.getVarAddress(functionName, p[-4]), "-1")
+				quadruple = Quad("operator_address", index_val, globalScope.functionDirectory.getVarAddress(functionName, p[-4]), address)
 				globalScope.quads.append(quadruple)
 
 				globalScope.quadCount += 2

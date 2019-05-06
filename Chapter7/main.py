@@ -2,8 +2,16 @@ import YaccKotoba
 import virtualMachine
 
 def parseCode(data) :
+
     YaccKotoba.parse(data)
     virtualMachine.execute_program()
+
+def getFinalVariables() :
+    return virtualMachine.finalVariables()
+
+def getOutput() :
+    return virtualMachine.printValues
+    
 
 
 if __name__ == '__main__':
@@ -33,7 +41,8 @@ if __name__ == '__main__':
           end
   '''
 
-
-
-
     parseCode(data)
+    print(getFinalVariables())
+    print("")
+    print(getOutput())
+

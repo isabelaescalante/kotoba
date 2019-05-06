@@ -4,35 +4,44 @@
         <title>Kotoba</title>
         <meta charset="utf-8">
         <link href="index.css" rel="stylesheet" type="text/css"/>
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     </head>
     <body>
         <h1>KOTOBA</h1>
 
         <div id="left">
                 <div>
-                    CODE
                     <form>
-                        <textarea rows="30" cols="80"></textarea>
+                        <textarea rows="20" cols="85" id="code" placeholder="Write code here.."></textarea>
                         <br>
-                        <button id="run_code">Run Code</button>
+                        <button id="run_code" onclick="run_code"><span>Run Code</span></button>
                     </form>
                 </div>
-                <div id="input">
-                    Input: <input type="text"/>
-                </div>
-                <div id="output">
-                    Output
+                <div class="io">
+                  <div id="input">
+                      Input
+                      <hr>
+                      <textarea rows="10" cols="50"></textarea>
+                  </div>
+                  <div id="output">
+                      Output
+                      <hr>
+                      <textarea rows="10" cols="50" readonly></textarea>
+                  </div>
                 </div>
         </div>
-    
+
         <div id="right">
             <div id="variables">
                 Variables
             </div>
             <div id="graphs">
-                Graphs
+                <div id="piechart"></div>
             </div>
         </div>
-        
+
+
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript" src="index.js"></script>
     </body>
 </html>

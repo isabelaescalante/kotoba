@@ -162,9 +162,6 @@ class Memory:
         for key, value in self.bool_memory.iteritems():
             print(key, value)
 
-    def getFinalNumbers(self) :
-        return self.number_memory.iteritems()
-  
 
 # #TEST
 # mem = Memory("Global", 1000, 1999)
