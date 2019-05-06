@@ -1,0 +1,17 @@
+body{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+td{
+    padding: 10px;
+}
+
+#left{
+    float: left;
+    width: 50%;
+}
+
+#right{
+    float: right;
+    width: 50%;
+}

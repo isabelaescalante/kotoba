@@ -2,6 +2,7 @@
 # March 15, 2019
 
 from collections import deque
+from memory import Memory
 
 #Quadruple
 class Quad:
@@ -91,6 +92,12 @@ class Queue:
     #Returns and removes first element in the queue
     def pop(self):
         return self.items.popleft()
+
+# Activation Record
+class ActivationRecord:
+    def __init__(self, func_memory):
+        self.era_memory = func_memory #local memory for current function, type: Memory
+
 
 
 

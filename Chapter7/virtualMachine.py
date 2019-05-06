@@ -2,7 +2,10 @@ import sys
 import globalScope
 from dataStruct import Quad
 from dataStruct import Stack
+from dataStruct import ActivationRecord
+from memory import Memory
 
+local_memory_handler = Stack()
 current_function_name = Stack()
 pending_return_value = Stack()
 return_ip = Stack()
@@ -10,20 +13,20 @@ param_count = 0
 
 def execute_program():
     instruction_pointer = globalScope.instruction_pointer
-
+    
     while True:
         current_quad = globalScope.quads[instruction_pointer]
         operator = current_quad.getOperator()
 
         if operator == "end":
-            print("-----------------------------")
-            globalScope.functionDirectory.global_memory.print_Memory()
-            print("-----------------------------")
-            globalScope.functionDirectory.local_memory.print_Memory()
-            print("-----------------------------")
-            globalScope.functionDirectory.constant_memory.print_Memory()
-            print("-----------------------------")
-            print("-----------------------------")
+            # print("-----------------------------")
+            # globalScope.functionDirectory.global_memory.print_Memory()
+            # print("-----------------------------")
+            # globalScope.functionDirectory.local_memory.print_Memory()
+            # print("-----------------------------")
+            # globalScope.functionDirectory.constant_memory.print_Memory()
+            # print("-----------------------------")
+            # print("-----------------------------")
             print("-----------------------------")
             sys.exit("Execution Successful")
         elif operator == "operator_add":
@@ -315,6 +318,19 @@ def goto_operation(operator, current_quad):
 
 def era_operation(current_quad):
     current_function_name.push(current_quad.getResult())
+    current_era = ActivationRecord(globalScope.functionDirectory.local_memory)
+    local_memory_handler.push(current_era)
+
+    # globalScope.functionDirectory.local_memory.clear_Memory()
+
+    new_memory = Memory("Local/Temporal", 2000, 3999)
+    new_era = ActivationRecord(new_memory)
+    local_memory_handler.push(new_era)
+    
+    # print("PREVIOUS ERA:")
+    # current_era.era_memory.print_Memory()
+    # print("-----------------------------")
+    
 
 def param_operation(current_quad):
     global param_count
@@ -322,9 +338,12 @@ def param_operation(current_quad):
     param_value = globalScope.functionDirectory.getVarValue(param_address)
 
     function_param_address = globalScope.functionDirectory.functions[current_function_name.top()][2][param_count][1]
-    globalScope.functionDirectory.setVarValue(function_param_address, param_value)
-    param_count += 1
+    
+    func_era = local_memory_handler.top()
+    func_era.era_memory.set_AddressValue(function_param_address, param_value)
 
+    # globalScope.functionDirectory.setVarValue(function_param_address, param_value)
+    param_count += 1
 
 def gosub_operation(current_quad, current_ip):
     global param_count
@@ -332,17 +351,38 @@ def gosub_operation(current_quad, current_ip):
     func_called = current_quad.getResult()
     param_count = 0
 
-    print("fib quad " + str(globalScope.functionDirectory.getFuncQuadPosition(func_called) - 1))
+    new_era = local_memory_handler.top()
+    globalScope.functionDirectory.local_memory = new_era.era_memory
+    
+    # print("ERA GOSUB")
+    # new_era.era_memory.print_Memory()
+    # print("-----------------------------")
+    
     return globalScope.functionDirectory.getFuncQuadPosition(func_called) - 1
 
 def return_operation(current_quad) :
     current_function_name.pop()
-
+    
     return_value = globalScope.functionDirectory.getVarValue(current_quad.getResult())
-
     pending_return_value.push(return_value)
+   
+    # print("Return Value: " + str(return_value))
+   
     new_ip = return_ip.pop()
-
+    
+    finished_era = local_memory_handler.pop()
+    
+    # print("ERA DONE:")
+    # finished_era.era_memory.print_Memory()
+    # print("-----------------------------")
+    
+    next_era = local_memory_handler.top()
+    
+    # print("NEXT ERA:")
+    # next_era.era_memory.print_Memory()
+    # print("-----------------------------")
+    
+    globalScope.functionDirectory.local_memory = next_era.era_memory
     # globalScope.functionDirectory.local_memory.clear_Memory()
 
     return new_ip
