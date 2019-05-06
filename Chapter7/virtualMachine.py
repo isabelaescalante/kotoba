@@ -418,7 +418,7 @@ def return_operation(current_quad) :
     # finished_era.era_memory.print_Memory()
     # print("-----------------------------")
     
-    next_era = local_memory_handler.top()
+    next_era = local_memory_handler.pop()
     
     # print("NEXT ERA:")
     # next_era.era_memory.print_Memory()
