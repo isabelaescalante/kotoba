@@ -2,49 +2,48 @@ body{
   font-family: 'Roboto', sans-serif;
 }
 
-h1{
-    padding: 0;
-    text-align: center;
-    font-size: 300%;
-}
-
-#left{
-    float: left;
-    width: 50%;
-    margin-left: 1%;
-}
-
-#right{
-    float: right;
-    margin: 0;
-    margin-left: 2%;
-    width: 40%;
-}
-
-button {
+.header {
+  margin: 0;
+  height: 100px;
   background-color: #008CBA;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  padding: 10px 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 15px;
-  float: right;
-  transition: all 0.5s;
-  cursor: pointer;
-  margin: 5px;
+  margin-bottom: 2%;
 }
 
-button span {
+.header h1{
+  padding: 0;
+  margin: 20px;
+  margin-left: 40px;
+  font-size: 400%;
+  display: inline-block;
+  vertical-align: middle;
+
+}
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload {
+  border-radius: 15px;
+  background-color: white;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+  margin-left: 5%;
+  transition: all 0.5s;
+}
+
+.custom-file-upload:hover {
+  background-color: grey;
+}
+
+.custom-file-upload span {
   cursor: pointer;
   display: inline-block;
   position: relative;
   transition: 0.5s;
 }
 
-button span:after {
+.custom-file-upload span:after {
   content: '\00bb';
   position: absolute;
   opacity: 0;
@@ -53,13 +52,26 @@ button span:after {
   transition: 0.5s;
 }
 
-button:hover span {
+.custom-file-upload:hover span {
   padding-right: 20px;
 }
 
-button:hover span:after {
+.custom-file-upload:hover span:after {
   opacity: 1;
   right: 0;
+}
+
+#left{
+    float: left;
+    width: 50%;
+    margin-left: 2%;
+}
+
+#right{
+    float: right;
+    margin: 0;
+    margin-right: 4%;
+    width: 40%;
 }
 
 #code {
@@ -67,7 +79,8 @@ button:hover span:after {
 }
 
 .io {
-  margin-top: 10%;
+  margin: 0;
+  margin-top: 3%;
   display: flex;
   justify-content: center;
   align-items: center;

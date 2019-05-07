@@ -1,0 +1,6 @@
+{
+	"input": [], 
+	"variables": [["x", "7.0"], ["f", 13.0]], 
+	"code": "kotoba program1;\n    \n          declare number x, number f;\n\n          function number fib(number n) {\n              declare number a, number aAux, number b, number bAux;\n               if(n < 2.0){\n                   return n;\n               }else{\n                   set aAux = n - 1.0;\n                   set bAux = n - 2.0;\n                   set a = call fib(aAux);\n                   set b = call fib(bAux);\n                   return (a + b);\n               }\n           }\n\n          begin\n          {\n              set x = 7.0;\n              set f = call fib(x);\n              kprint(f);\n          }\n          end\n  ", 
+	"output": [13.0]
+}
