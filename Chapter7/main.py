@@ -59,4 +59,3 @@ if __name__ == '__main__':
 
     with open('/result_files/compilationResult.json', 'w') as f:
         json.dump(data, f)
-
