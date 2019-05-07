@@ -1,5 +1,6 @@
 import YaccKotoba
 import virtualMachine
+import json
 
 def parseCode(data) :
 
@@ -11,11 +12,14 @@ def getFinalVariables() :
 
 def getOutput() :
     return virtualMachine.printValues
+
+def getInputs() :
+    return virtualMachine.inputValues
     
 
 
 if __name__ == '__main__':
-    data = '''kotoba program1;
+    code = '''kotoba program1;
     
           declare number x, number f;
 
@@ -41,8 +45,18 @@ if __name__ == '__main__':
           end
   '''
 
-    parseCode(data)
-    print(getFinalVariables())
-    print("")
-    print(getOutput())
+    parseCode(code)
+    variables = getFinalVariables()
+    output = getOutput()
+    inputs = getInputs()
+
+    data = {
+        'code' : code,
+        'input' : inputs,
+        'variables' : variables,
+        'output' : output
+    }
+
+    with open('/result_files/compilationResult.json', 'w') as f:
+        json.dump(data, f)
 

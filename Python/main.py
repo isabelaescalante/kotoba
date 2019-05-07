@@ -1,5 +1,6 @@
 import YaccKotoba
 import virtualMachine
+import json
 
 def parseCode(data) :
 
@@ -11,38 +12,52 @@ def getFinalVariables() :
 
 def getOutput() :
     return virtualMachine.printValues
+
+def getInputs() :
+    return virtualMachine.inputValues
     
 
 
 if __name__ == '__main__':
-    data = '''kotoba program1;
-        declare word w[4.0], number n, sentence s, number arr[5.0], number len;
+    code = '''kotoba program1;
+    
+          declare number x, number f;
 
-        begin
-        {
-            set s = "The dog is running.";
-            set arr = {2.0, 34.5, 67.56, 4.1, 0.12};
+          function number fib(number n) {
+              declare number a, number aAux, number b, number bAux;
+               if(n < 2.0){
+                   return n;
+               }else{
+                   
+                   set aAux = n - 1.0;
+                   set bAux = n - 2.0;
+                   set a = call fib(aAux);
+                   set b = call fib(bAux);
+                   return (a + b);
+               }
+           }
 
-            set w = call s.tokenize();
+          begin
+          {
+              set x = 7.0;
+              set f = call fib(x);
+              kprint(f);
+          }
+          end
+  '''
 
-            set n = 0.0;
+    parseCode(code)
+    variables = getFinalVariables()
+    output = getOutput()
+    inputs = getInputs()
 
-            set len = call w.size();
+    data = {
+        'code' : code,
+        'input' : inputs,
+        'variables' : variables,
+        'output' : output
+    }
 
-            while(n < len) {
-                kprint(w[n]);
-                set n = n + 1.0;
-            }
+    with open('result_files/compilationResult.json', 'w') as f:
+        json.dump(data, f)
 
-            set s=w[0.0]+w[1.0];
-
-            kprint(s);
-
-            set n = 0.0;
-        }
-        end
-    '''
-    parseCode(data)
-    print(getFinalVariables())
-    print("")
-    print(getOutput())

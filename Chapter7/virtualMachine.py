@@ -17,6 +17,7 @@ pending_return_value = Stack()
 return_ip = Stack()
 param_count = 0
 printValues = []
+inputValues = []
 
 def execute_program():
     instruction_pointer = globalScope.instruction_pointer
@@ -327,6 +328,7 @@ def read_operation(current_quad):
             globalScope.functionDirectory.setVarValue(id_address, input_value)
         else:
             sys.exit("Wrong input for sentence")
+    inputValues.append(input_value)
 
 # Goto operations
 def goto_operation(operator, current_quad):

@@ -1,3 +1,5 @@
+var jsonFile;
+
 // Load google charts
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(drawChart);
@@ -20,31 +22,52 @@ function drawChart() {
     chart.draw(data, options);
 }
 
-$(document).ready(function() {
-  $("#run_code").on('click', function() {
-    code = $("#code").val();
-    if(code == "") {
-      alert("Write code to run.");
+function readFiles() {
+  var file = $("#file-upload")[0].files[0];
+  console.log(file.name);
+  $(".file-info").html(`${file.name}`);
+}
+
+function readFiles(event) {
+    var fileList = event.target.files;
+
+    for(var i=0; i < fileList.length; i++ ) {
+        loadAsText(fileList[i]);
     }
-  });
-})
+}
 
+function loadAsText(theFile) {
+    var reader = new FileReader();
 
-//ajax post request
-function post_request_ajax(uri,data_js,result_id){
-    $.ajax({
-        url: uri,
-        type: "POST",
-        data: data_js,
-        dataType: "json",
-        contentType: "application/json",
-        success: function (jsonResponse) {
-            //alert("success" + jsonResponse.result);
-            $(result_id).text(jsonResponse.result);
-        },
-        error: function (errorMessage) {
-            alert("error");
+    reader.onload = function(loadedEvent) {
+        // result contains loaded file.
+        jsonFile = JSON.parse(loadedEvent.target.result);
+        addCompilationResult();
+    }
+    reader.readAsText(theFile);
+}
 
-        }
-    });
+function addCompilationResult() {
+  code = jsonFile.code;
+  input = jsonFile.input;
+  output = jsonFile.output;
+  variables = jsonFile.variables;
+  $("#code").val(code);
+  if(input.length == 0) {
+    $("#inputTA").val("");
+  }
+  else {
+    for (var i = 0; i < input.length; i++) {
+      $("#inputTA").append(input[i]);
+    }
+  }
+  if(output.length == 0) {
+    $("#outputTA").val("");
+  }
+  else {
+    for (var i = 0; i < output.length; i++) {
+      $("#outputTA").append(output[i]);
+    }
+  }
+
 }
