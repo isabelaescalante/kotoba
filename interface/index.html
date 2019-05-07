@@ -17,27 +17,69 @@
         <div id="left">
                 <div class="code">
                     <form>
-                        <textarea rows="18" cols="85" id="code" placeholder="Code goes here.." readonly></textarea>
+                        <textarea rows="18" cols="85" id="code" placeholder="The code goes here.." readonly></textarea>
                     </form>
                 </div>
                 <hr>
                 <div class="io">
                   <div id="input">
-                      <textarea rows="8" cols="40" placeholder="Input" id="inputTA" readonly></textarea>
+                    <b>Input</b>
+                      <textarea rows="8" cols="40" placeholder="The input goes here.." id="inputTA" readonly></textarea>
                   </div>
                   <div id="output">
-                      <textarea rows="8" cols="40" placeholder="Output" id="outputTA" readonly></textarea>
+                    <b>Output</b>
+                      <textarea rows="8" cols="40" placeholder="And the output here.." id="outputTA" readonly></textarea>
                   </div>
                 </div>
         </div>
 
         <div id="right">
             <div id="variables">
-                Variables
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Variable</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
             </div>
-            <hr>
             <div id="graphs">
-                <div id="piechart"></div>
+              <div class="btn-group d-flex justify-content-center" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-secondary bar" onclick="barGraph()" disabled>Bar graph</button>
+                <button type="button" class="btn btn-secondary pie" onclick="pieGraph()" disabled>Pie graph</button>
+                <button type="button" class="btn btn-secondary scatter" onclick="scatterGraph()" disabled>Scatter graph</button>
+                <button type="button" class="btn btn-secondary tree" onclick="wordGraph()" disabled>Word tree</button>
+              </div>
+              <div class="d-flex justify-content-center">
+                <div class="graph-options dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    x-axis
+                  </button>
+                  <div class="dropdown-menu x-axis" aria-labelledby="dropdownMenuButton">
+                  </div>
+                </div>
+                <div class=" graph-options dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    y-axis
+                  </button>
+                  <div class="dropdown-menu y-axis" aria-labelledby="dropdownMenuButton">
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-center">
+                <div class="tree-options dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    options
+                  </button>
+                  <div class="dropdown-menu one-axis" aria-labelledby="dropdownMenuButton">
+                  </div>
+                </div>
+              </div>
+              <div id="piechart" class="d-flex justify-content-center"></div>
             </div>
         </div>
 

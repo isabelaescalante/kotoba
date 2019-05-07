@@ -1,6 +1,8 @@
 import YaccKotoba
 import virtualMachine
 import json
+import os
+import webbrowser
 
 def parseCode(data) :
 
@@ -20,30 +22,32 @@ def getInputs() :
 
 if __name__ == '__main__':
     code = '''kotoba program1;
-    
-          declare number x, number f;
+       declare word w[4.0], number n, sentence s, number arr[5.0], number len;
 
-          function number fib(number n) {
-              declare number a, number aAux, number b, number bAux;
-               if(n < 2.0){
-                   return n;
-               }else{
-                   
-                   set aAux = n - 1.0;
-                   set bAux = n - 2.0;
-                   set a = call fib(aAux);
-                   set b = call fib(bAux);
-                   return (a + b);
-               }
+       begin
+       {
+           set s = "The dog is running.";
+           set arr = {2.0, 34.5, 67.56, 4.1, 0.12};
+
+           set w = call s.tokenize();
+
+           set n = 0.0;
+
+           set len = call w.size();
+
+           while(n < len) {
+               kprint(w[n]);
+               set n = n + 1.0;
            }
 
-          begin
-          {
-              set x = 7.0;
-              set f = call fib(x);
-              kprint(f);
-          }
-          end
+           set s=w[0.0]+w[1.0];
+
+           kprint(s);
+
+           set n = 0.0;
+       }
+       end
+
   '''
 
     parseCode(code)
@@ -52,12 +56,17 @@ if __name__ == '__main__':
     inputs = getInputs()
 
     data = {
-        'code' : code,
-        'input' : inputs,
-        'variables' : variables,
-        'output' : output
+        "code" : code,
+        "input" : inputs,
+        "variables" : variables,
+        "output" : output
     }
 
     with open('result_files/compilationResult.json', 'w') as f:
         json.dump(data, f)
+
+    
+    filename = "file:///Users/isaescalante96/Desktop/Tec/Octavo_Semestre/Compiladores/Kotoba/Interface/index.html"
+        
+    webbrowser.open_new_tab(filename)
 

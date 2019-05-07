@@ -5,7 +5,7 @@ body{
 .header {
   margin: 0;
   height: 100px;
-  background-color: #008CBA;
+  background-color: #ffb7c5;
   margin-bottom: 2%;
 }
 
@@ -76,6 +76,7 @@ input[type="file"] {
 
 #code {
   font-size: 100%;
+  padding-left: 10px;
 }
 
 .io {
@@ -98,6 +99,40 @@ input[type="file"] {
   margin-right: 10%;
 }
 
+#outputTA, #inputTA {
+  padding-left: 10px;
+}
 
-#graphs {
+
+.table {
+  text-align: center;
+}
+
+.table td {
+  letter-spacing: 1px;
+}
+
+#variables {
+  margin-bottom: 10%;
+}
+
+.graph-options {
+  display: none;
+  margin: 40px;
+}
+
+.graph-options .dropdown {
+  margin: 40px;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.tree-options {
+  display: none;
+  margin: 40px;
+}
+
+.tree-options .dropdown {
+  margin-top: 40px;
+  text-align: center;
 }
