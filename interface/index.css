@@ -5,7 +5,7 @@ body{
 .header {
   margin: 0;
   height: 100px;
-  background-color: #008CBA;
+  background-color: #ffb7c5;
   margin-bottom: 2%;
 }
 
@@ -76,6 +76,7 @@ input[type="file"] {
 
 #code {
   font-size: 100%;
+  padding-left: 10px;
 }
 
 .io {
@@ -98,6 +99,34 @@ input[type="file"] {
   margin-right: 10%;
 }
 
+#outputTA, #inputTA {
+  padding-left: 10px;
+}
 
-#graphs {
+
+.table {
+  text-align: center;
+}
+
+.table td {
+  letter-spacing: 1px;
+}
+
+#variables {
+  margin-bottom: 10%;
+}
+
+.form-group {
+  display: inline;
+  margin: 40px;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.x-axis {
+  margin-right: 50px;
+}
+
+#sel1Bar, #sel2Bar, #sel1Pie, #sel2Pie, #sel1Scatter, #sel2Scatter, #barchart, #piechart, #scatterchart {
+  display: none;
 }

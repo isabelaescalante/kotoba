@@ -133,35 +133,35 @@ class Array :
     def size(self) :
         return float(len(self.lst))
 
-if __name__ == '__main__':
-    funcionesWord = Word()
-    funcionesWord.createWord('prueba')
-    funcionesWord.length()
-    print(len('prueba'))
-    print(funcionesWord.length())
-
-    funcionesWordList = WordArray()
-    funcionesWordList.createArray(['avion', 'mundo', 'avion', 'avion'])
-    print(funcionesWordList.frequency('avion'))
-    print(funcionesWordList.search('avion'))
-    print(funcionesWordList.exists('mundo'))
-    funcionesWordList.sortWords()
-    for word in funcionesWordList.wordArr:
-        print word
-
-    funcionesSentence = Sentence()
-    funcionesSentence.createSentence('The people are flying.')
-    print(funcionesSentence.wordCount())
-    print(funcionesSentence.tokenize())
-    print(funcionesSentence.remove('flying'))
-
-    funcionesNum = Numbers()
-    funcionesNum.createArray([1,2,3,3,2,6])
-    print(funcionesNum.mean())
-    print(funcionesNum.median())
-    print(funcionesNum.mode())
-    funcionesNum.sortNumbers()
-    for num in funcionesNum.numbers:
-        print num
+#if __name__ == '__main__':
+#    funcionesWord = Word()
+#    funcionesWord.createWord('prueba')
+#    funcionesWord.length()
+#    print(len('prueba'))
+#    print(funcionesWord.length())
+#
+#    funcionesWordList = WordArray()
+#    funcionesWordList.createArray(['avion', 'mundo', 'avion', 'avion'])
+#    print(funcionesWordList.frequency('avion'))
+#    print(funcionesWordList.search('avion'))
+#    print(funcionesWordList.exists('mundo'))
+#    funcionesWordList.sortWords()
+#    for word in funcionesWordList.wordArr:
+#        print word
+#
+#    funcionesSentence = Sentence()
+#    funcionesSentence.createSentence('The people are flying.')
+#    print(funcionesSentence.wordCount())
+#    print(funcionesSentence.tokenize())
+#    print(funcionesSentence.remove('flying'))
+#
+#    funcionesNum = Numbers()
+#    funcionesNum.createArray([1,2,3,3,2,6])
+#    print(funcionesNum.mean())
+#    print(funcionesNum.median())
+#    print(funcionesNum.mode())
+#    funcionesNum.sortNumbers()
+#    for num in funcionesNum.numbers:
+#        print num
    
 

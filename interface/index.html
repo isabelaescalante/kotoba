@@ -17,27 +17,80 @@
         <div id="left">
                 <div class="code">
                     <form>
-                        <textarea rows="18" cols="85" id="code" placeholder="Code goes here.." readonly></textarea>
+                        <textarea rows="18" cols="85" id="code" placeholder="The code goes here.." readonly></textarea>
                     </form>
                 </div>
                 <hr>
                 <div class="io">
                   <div id="input">
-                      <textarea rows="8" cols="40" placeholder="Input" id="inputTA" readonly></textarea>
+                    <b>Input</b>
+                      <textarea rows="8" cols="40" placeholder="The input goes here.." id="inputTA" readonly></textarea>
                   </div>
                   <div id="output">
-                      <textarea rows="8" cols="40" placeholder="Output" id="outputTA" readonly></textarea>
+                    <b>Output</b>
+                      <textarea rows="8" cols="40" placeholder="And the output here.." id="outputTA" readonly></textarea>
                   </div>
                 </div>
         </div>
 
         <div id="right">
             <div id="variables">
-                Variables
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Variable</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
             </div>
-            <hr>
             <div id="graphs">
-                <div id="piechart"></div>
+              <div class="btn-group d-flex justify-content-center" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-secondary bar" onclick="barGraph()" disabled>Bar graph</button>
+                <button type="button" class="btn btn-secondary pie" onclick="pieGraph()" disabled>Pie graph</button>
+                <button type="button" class="btn btn-secondary scatter" onclick="scatterGraph()" disabled>Scatter graph</button>
+              </div>
+              <div class="d-flex justify-content-center">
+                <form class="form-inline">
+                    <div class="form-group graph-options" >
+                      <select class="form-control x-axis" id="sel1Bar">
+                        <option selected>x-axis</option>
+                      </select>
+                      <br>
+                      <select class="form-control y-axis" id="sel2Bar">
+                        <option selected>y-axis</option>
+                      </select>
+                    </div>
+                  </form>
+                  <form class="form-inline">
+                      <div class="form-group graph-options" >
+                        <select class="form-control x-axis" id="sel1Pie">
+                          <option selected>x-axis</option>
+                        </select>
+                        <br>
+                        <select class="form-control y-axis" id="sel2Pie">
+                          <option selected>y-axis</option>
+                        </select>
+                      </div>
+                    </form>
+                    <form class="form-inline">
+                        <div class="form-group graph-options" >
+                          <select class="form-control x-axis" id="sel1Scatter">
+                            <option selected>x-axis</option>
+                          </select>
+                          <br>
+                          <select class="form-control y-axis" id="sel2Scatter">
+                            <option selected>y-axis</option>
+                          </select>
+                        </div>
+                      </form>
+              </div>
+              <div id="piechart" class="d-flex justify-content-center"></div>
+              <div id="barchart" class="d-flex justify-content-center"></div>
+              <div id="scatterchart" class="d-flex justify-content-center"></div>
             </div>
         </div>
 

@@ -716,6 +716,7 @@ def finalVariables() :
 
     for varName in globalScope.functionDirectory.functions["Main"][1] :
         size = globalScope.functionDirectory.functions["Main"][1][varName][1]
+        varType = globalScope.functionDirectory.functions["Main"][1][varName][0]
         if size == 1 :
             data = globalScope.functionDirectory.functions["Main"][1][varName]
             value = globalScope.functionDirectory.getVarValue(data[2])
@@ -728,7 +729,7 @@ def finalVariables() :
                 i += 1
             value = values
         if not value is None:
-            variables.append([varName, value])
+            variables.append([varName, varType, value])
 
     return variables
 
