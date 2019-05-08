@@ -29,17 +29,19 @@ def execute_program():
         if operator == "end":
             print("")
             print("-----------------------------")
-            print("-----------------------------")
-            print("-----------------------------")
-            print("-----------------------------")
-            globalScope.functionDirectory.global_memory.print_Memory()
-            print("-----------------------------")
-            globalScope.functionDirectory.local_memory.print_Memory()
-            print("-----------------------------")
-            globalScope.functionDirectory.constant_memory.print_Memory()
-            print("-----------------------------")
+
+            # print("-----------------------------")
+            # print("-----------------------------")            
+            # print("-----------------------------")
+            # globalScope.functionDirectory.global_memory.print_Memory()
+            # print("-----------------------------")
+            # globalScope.functionDirectory.local_memory.print_Memory()
+            # print("-----------------------------")
+            # globalScope.functionDirectory.constant_memory.print_Memory()
+            # print("-----------------------------")
             print("Execution Successful")
             break
+
         elif operator == "operator_add":
             arithmetic_operation("operator_add", current_quad)
             instruction_pointer += 1
@@ -159,13 +161,13 @@ def arithmetic_operation(operator, current_quad):
         except:
             result_value = left_value + right_value
             result_value = result_value.replace('""', ' ')
-
+    
     elif operator == "operator_minus":
         result_value = float(left_value) - float(right_value)
     elif operator == "operator_mult":
         result_value = float(left_value) * float(right_value)
     elif operator == "operator_div":
-        if right_value == 0:
+        if right_value == "0.0":
             sys.exit("Unable to perform division by 0")
         else:
             result_value = float(left_value) / float(right_value)

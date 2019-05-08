@@ -216,6 +216,7 @@ function getPieGraphValues() {
     }
 
     createGraph();
+    $(".form-inline").trigger("reset");
   }
 }
 
@@ -251,6 +252,7 @@ function getScatterGraphValues() {
     }
 
     createGraph();
+    $(".form-inline").trigger("reset");
   }
 }
 
