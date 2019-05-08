@@ -22,51 +22,46 @@ def getInputs() :
 
 if __name__ == '__main__':
     code = '''kotoba program1;
-       declare word w[4.0], number n, sentence s, number arr[4.0], number len;
-
-       begin
-       {
-           set s = "The dog is running.";
-           set arr = {2.0, 4.0, 12.0, 6.0};
-
-           set w = call s.tokenize();
-
-           set n = 0.0;
-
-           set len = call w.size();
-
-           while(n < len) {
-               kprint(w[n]);
-               set n = n + 1.0;
+    
+          declare number x, number f;
+          function number fib(number n) {
+              declare number a, number aAux, number b, number bAux;
+               if(n < 2.0){
+                   return n;
+               }else{
+                   set aAux = n - 1.0;
+                   set bAux = n - 2.0;
+                   set a = call fib(aAux);
+                   set b = call fib(bAux);
+                   return (a + b);
+               }
            }
-
-           set s=w[0.0]+w[1.0];
-
-           kprint(s);
-
-           set n = 0.0;
-       }
-       end
-
+          begin
+          {
+              set x = 7.0;
+              set f = call fib(x);
+              kprint(f);
+          }
+          end
   '''
+
 
     parseCode(code)
     variables = getFinalVariables()
     output = getOutput()
     inputs = getInputs()
-
+    
     data = {
         "code" : code,
         "input" : inputs,
         "variables" : variables,
         "output" : output
     }
-
+    
     with open('result_files/compilationResult.json', 'w') as f:
         json.dump(data, f)
 
-    
-    filename = "file:///Users/isaescalante96/Desktop/Tec/Octavo_Semestre/Compiladores/Kotoba/Interface/index.html"
-        
-    webbrowser.open_new_tab(filename)
 
+    filename = 'file:///Users/isaescalante96/Desktop/Tec/Octavo%20Semestre/Compiladores/Kotoba/Interface/index.html'
+
+    webbrowser.open_new_tab(filename)
