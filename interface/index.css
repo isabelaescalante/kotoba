@@ -116,23 +116,17 @@ input[type="file"] {
   margin-bottom: 10%;
 }
 
-.graph-options {
-  display: none;
-  margin: 40px;
-}
-
-.graph-options .dropdown {
+.form-group {
+  display: inline;
   margin: 40px;
   margin-bottom: 0;
   text-align: center;
 }
 
-.tree-options {
-  display: none;
-  margin: 40px;
+.x-axis {
+  margin-right: 50px;
 }
 
-.tree-options .dropdown {
-  margin-top: 40px;
-  text-align: center;
+#sel1Bar, #sel2Bar, #sel1Pie, #sel2Pie, #sel1Scatter, #sel2Scatter, #barchart, #piechart, #scatterchart {
+  display: none;
 }

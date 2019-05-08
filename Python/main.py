@@ -22,12 +22,12 @@ def getInputs() :
 
 if __name__ == '__main__':
     code = '''kotoba program1;
-       declare word w[4.0], number n, sentence s, number arr[5.0], number len;
+       declare word w[4.0], number n, sentence s, number arr[4.0], number len;
 
        begin
        {
            set s = "The dog is running.";
-           set arr = {2.0, 34.5, 67.56, 4.1, 0.12};
+           set arr = {2.0, 4.0, 12.0, 6.0};
 
            set w = call s.tokenize();
 

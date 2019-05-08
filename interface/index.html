@@ -52,34 +52,45 @@
                 <button type="button" class="btn btn-secondary bar" onclick="barGraph()" disabled>Bar graph</button>
                 <button type="button" class="btn btn-secondary pie" onclick="pieGraph()" disabled>Pie graph</button>
                 <button type="button" class="btn btn-secondary scatter" onclick="scatterGraph()" disabled>Scatter graph</button>
-                <button type="button" class="btn btn-secondary tree" onclick="wordGraph()" disabled>Word tree</button>
               </div>
               <div class="d-flex justify-content-center">
-                <div class="graph-options dropdown">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    x-axis
-                  </button>
-                  <div class="dropdown-menu x-axis" aria-labelledby="dropdownMenuButton">
-                  </div>
-                </div>
-                <div class=" graph-options dropdown">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    y-axis
-                  </button>
-                  <div class="dropdown-menu y-axis" aria-labelledby="dropdownMenuButton">
-                  </div>
-                </div>
-              </div>
-              <div class="d-flex justify-content-center">
-                <div class="tree-options dropdown">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    options
-                  </button>
-                  <div class="dropdown-menu one-axis" aria-labelledby="dropdownMenuButton">
-                  </div>
-                </div>
+                <form class="form-inline">
+                    <div class="form-group graph-options" >
+                      <select class="form-control x-axis" id="sel1Bar">
+                        <option selected>x-axis</option>
+                      </select>
+                      <br>
+                      <select class="form-control y-axis" id="sel2Bar">
+                        <option selected>y-axis</option>
+                      </select>
+                    </div>
+                  </form>
+                  <form class="form-inline">
+                      <div class="form-group graph-options" >
+                        <select class="form-control x-axis" id="sel1Pie">
+                          <option selected>x-axis</option>
+                        </select>
+                        <br>
+                        <select class="form-control y-axis" id="sel2Pie">
+                          <option selected>y-axis</option>
+                        </select>
+                      </div>
+                    </form>
+                    <form class="form-inline">
+                        <div class="form-group graph-options" >
+                          <select class="form-control x-axis" id="sel1Scatter">
+                            <option selected>x-axis</option>
+                          </select>
+                          <br>
+                          <select class="form-control y-axis" id="sel2Scatter">
+                            <option selected>y-axis</option>
+                          </select>
+                        </div>
+                      </form>
               </div>
               <div id="piechart" class="d-flex justify-content-center"></div>
+              <div id="barchart" class="d-flex justify-content-center"></div>
+              <div id="scatterchart" class="d-flex justify-content-center"></div>
             </div>
         </div>
 
